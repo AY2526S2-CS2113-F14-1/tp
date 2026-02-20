@@ -1,4 +1,4 @@
-# Duke
+# SpendSwift
 
 {Give product intro here}
 
