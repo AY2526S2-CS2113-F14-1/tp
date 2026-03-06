@@ -1,9 +1,5 @@
 # About us
 
-Display | Name | Github Profile | Portfolio 
---------|:----:|:--------------:|:---------:
-![](https://via.placeholder.com/100.png?text=Photo) | John Doe | [Github](https://github.com/) | [Portfolio](docs/team/johndoe.md)
-![](https://via.placeholder.com/100.png?text=Photo) | Don Joe | [Github](https://github.com/) | [Portfolio](docs/team/johndoe.md)
-![](https://via.placeholder.com/100.png?text=Photo) | Ron John | [Github](https://github.com/) | [Portfolio](docs/team/johndoe.md)
-![](https://via.placeholder.com/100.png?text=Photo) | John Roe | [Github](https://github.com/) | [Portfolio](docs/team/johndoe.md)
-![](https://via.placeholder.com/100.png?text=Photo) | Don Roe | [Github](https://github.com/) | [Portfolio](docs/team/johndoe.md)
+Display | Name  | Github Profile | Portfolio 
+--------|:-----:|:--------------:|:---------:
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0-bbeRlPdkz7vhvACzWQ4BJ1CXlxTzf14Q4QwncVZK4vIRwtJF_0YtmklNSwP99g9fBMd78NhQiZqZWDM_YbAHoOHIZuNvSrCeUxAXE0EvA&s=10) | Aryan | [Github](https://github.com/https://github.com/aruyadav13) | [aruyadav13](docs/team/johndoe.md)
