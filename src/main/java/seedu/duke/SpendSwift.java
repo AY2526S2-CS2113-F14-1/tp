@@ -47,6 +47,29 @@ public class SpendSwift {
             case "help":
                 printHelp();
                 break;
+            case "add":
+                String[] parts = fullCommand.split("\\s+", 3);
+                if (parts.length < 3) {
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    System.out.println("Usage: add <amount> <description>");
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    break;
+                }
+
+                try {
+                    double amount = Double.parseDouble(parts[1]);
+                    String description = parts[2];
+
+                    AddExpense addCommand = new AddExpense(description, amount);
+                    addCommand.execute(expenseList);
+                    storage.save(expenseList);
+
+                } catch (NumberFormatException e) {
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    System.out.println("Amount must be a valid number.");
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                }
+                break;
             case "exit":
                 isExit = true;
                 storage.save(expenseList);
