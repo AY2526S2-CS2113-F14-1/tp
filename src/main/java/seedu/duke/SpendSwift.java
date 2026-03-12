@@ -35,17 +35,36 @@ public class SpendSwift {
 
             String commandWord = fullCommand.split(" ")[0].toLowerCase();
 
-            if (commandWord.equals("exit")) {
+            switch (commandWord) {
+            case "help":
+                printHelp();
+                break;
+            case "exit":
                 isExit = true;
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            } else {
-                // The rest of the team will add their commands here!
-                System.out.println("Command not recognized yet! Team is working on it.");
+                break;
+            default:
+                System.out.println("Unknown command. Type 'help' to see available commands.");
+                break;
             }
         }
         scanner.close();
+    }
+
+    /**
+     * Prints the help menu showing all available commands and their formats.
+     */
+    private static void printHelp() {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Here are the available commands:");
+        System.out.println("  add AMOUNT DESCRIPTION  - Add a new expense");
+        System.out.println("  list                    - List all expenses");
+        System.out.println("  delete INDEX            - Delete an expense by index");
+        System.out.println("  help                    - Show this help menu");
+        System.out.println("  exit                    - Exit the application");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     }
 
     /**
