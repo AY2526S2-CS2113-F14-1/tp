@@ -40,6 +40,27 @@ public class SpendSwift {
                 System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            } else if (commandWord.equals("add")) {
+                String[] parts = fullCommand.split("\\s+", 3);
+                if (parts.length < 3) {
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    System.out.println("Usage: add <amount> <description>");
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    continue;
+                }
+
+                try {
+                    double amount = Double.parseDouble(parts[1]);
+                    String description = parts[2];
+
+                    AddExpense addCommand = new AddExpense(description, amount);
+                    addCommand.execute(expenseList);
+
+                } catch (NumberFormatException e) {
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    System.out.println("Amount must be a valid number.");
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                }
             } else {
                 // The rest of the team will add their commands here!
                 System.out.println("Command not recognized yet! Team is working on it.");
