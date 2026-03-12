@@ -15,3 +15,17 @@ bin/
 
 /text-ui-test/ACTUAL.TXT
 text-ui-test/EXPECTED-UNIX.TXT
+
+# Course PDFs and style guides (local only)
+*.pdf
+
+# AI / personal context files (local only)
+CONTEXT.md
+.gemini/
+
+# VS Code workspace-local settings
+.vscode/
+
+# Common AI/tooling local context folders
+.claude/
+.cursor/
