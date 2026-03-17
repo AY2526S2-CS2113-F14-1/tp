@@ -58,7 +58,7 @@ public class SpendSwift {
                     double amount = Double.parseDouble(parts[1]);
                     String description = parts[2];
 
-                    AddExpense addCommand = new AddExpense(description, amount);
+                    AddCommand addCommand = new AddCommand(description, amount);
                     addCommand.execute(expenseList, ui);
                     storage.save(expenseList);
 
@@ -81,7 +81,7 @@ public class SpendSwift {
                 try {
                     int index = Integer.parseInt(deleteParts[1]);
                     // Assuming you create a DeleteExpense class similar to AddExpense
-                    DeleteExpense deleteCommand = new DeleteExpense(index);
+                    DeleteCommand deleteCommand = new DeleteCommand(index);
                     deleteCommand.execute(expenseList, ui);
                     storage.save(expenseList); // Save immediately after deletion
 

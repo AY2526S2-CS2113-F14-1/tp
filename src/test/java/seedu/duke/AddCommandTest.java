@@ -3,15 +3,15 @@ package seedu.duke;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AddExpenseTest {
+public class AddCommandTest {
 
     @Test
     public void execute_singleExpense_expenseAddedToList() {
         ExpenseList expenseList = new ExpenseList();
         Ui ui = new Ui();
-        AddExpense addExpense = new AddExpense("Coffee", 5.50);
+        AddCommand addCommand = new AddCommand("Coffee", 5.50);
 
-        addExpense.execute(expenseList, ui);
+        addCommand.execute(expenseList, ui);
 
         assertEquals(1, expenseList.getSize());
         assertEquals("Coffee", expenseList.getExpense(0).getDescription());
@@ -23,8 +23,8 @@ public class AddExpenseTest {
         ExpenseList expenseList = new ExpenseList();
         Ui ui = new Ui();
 
-        AddExpense firstExpense = new AddExpense("Coffee", 5.50);
-        AddExpense secondExpense = new AddExpense("Lunch", 12.30);
+        AddCommand firstExpense = new AddCommand("Coffee", 5.50);
+        AddCommand secondExpense = new AddCommand("Lunch", 12.30);
 
         firstExpense.execute(expenseList, ui);
         secondExpense.execute(expenseList, ui);
@@ -42,9 +42,9 @@ public class AddExpenseTest {
     public void execute_zeroAmount_expenseAdded() {
         ExpenseList expenseList = new ExpenseList();
         Ui ui = new Ui();
-        AddExpense addExpense = new AddExpense("Free sample", 0.0);
+        AddCommand addCommand = new AddCommand("Free sample", 0.0);
 
-        addExpense.execute(expenseList, ui);
+        addCommand.execute(expenseList, ui);
 
         assertEquals(1, expenseList.getSize());
         assertEquals("Free sample", expenseList.getExpense(0).getDescription());
