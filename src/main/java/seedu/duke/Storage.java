@@ -12,14 +12,17 @@ import java.util.Scanner;
 public class Storage {
     private static final String SEPARATOR = " | ";
     private final String filePath;
+    private final Ui ui;
 
     /**
-     * Constructs a Storage object with the given file path.
+     * Constructs a Storage object with the given file path and Ui instance.
      *
      * @param filePath The path to the data file.
+     * @param ui The Ui object used to display messages and warnings.
      */
-    public Storage(String filePath) {
+    public Storage(String filePath, Ui ui) {
         this.filePath = filePath;
+        this.ui = ui;
     }
 
     /**
@@ -45,7 +48,7 @@ public class Storage {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Warning: Could not load data file. Starting with empty list.");
+            ui.showLoadWarning();
         }
     }
 
@@ -68,7 +71,7 @@ public class Storage {
                         + System.lineSeparator());
             }
         } catch (IOException e) {
-            System.out.println("Warning: Could not save data to file.");
+            ui.showSaveWarning();
         }
     }
 
@@ -81,7 +84,7 @@ public class Storage {
     private Expense parseLine(String line) {
         String[] parts = line.split("\\|", 2);
         if (parts.length < 2) {
-            System.out.println("Warning: Skipping malformed line: " + line);
+            ui.showMalformedLineWarning(line);
             return null;
         }
         try {
@@ -89,7 +92,7 @@ public class Storage {
             String description = parts[1].trim();
             return new Expense(description, amount);
         } catch (NumberFormatException e) {
-            System.out.println("Warning: Skipping line with invalid amount: " + line);
+            ui.showInvalidAmountLineWarning(line);
             return null;
         }
     }

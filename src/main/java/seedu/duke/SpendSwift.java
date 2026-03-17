@@ -10,6 +10,7 @@ public class SpendSwift {
     private static final String DATA_FILE_PATH = "data/expenses.txt";
     private ExpenseList expenseList;
     private Storage storage;
+    private Ui ui;
 
     /**
      * Constructs a SpendSwift instance and initializes the core components.
@@ -17,7 +18,8 @@ public class SpendSwift {
      */
     public SpendSwift() {
         expenseList = new ExpenseList();
-        storage = new Storage(DATA_FILE_PATH);
+        ui = new Ui();
+        storage = new Storage(DATA_FILE_PATH, ui);
         storage.load(expenseList);
     }
 
@@ -27,9 +29,7 @@ public class SpendSwift {
      */
     public void run() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Hello! I'm SpendSwift.");
-        System.out.println("What expenses are we tracking today?");
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        ui.showWelcome();
 
         boolean isExit = false;
         while (!isExit && scanner.hasNextLine()) {
@@ -42,17 +42,15 @@ public class SpendSwift {
 
             switch (commandWord) {
             case "list":
-                printAllExpenses();
+                new ListCommand(ui).execute(expenseList);
                 break;
             case "help":
-                printHelp();
+                new HelpCommand(ui).execute(expenseList);
                 break;
             case "add":
                 String[] parts = fullCommand.split("\\s+", 3);
                 if (parts.length < 3) {
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                    System.out.println("Usage: add <amount> <description>");
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    ui.showAddUsage();
                     break;
                 }
 
@@ -61,79 +59,42 @@ public class SpendSwift {
                     String description = parts[2];
 
                     AddExpense addCommand = new AddExpense(description, amount);
-                    addCommand.execute(expenseList);
+                    addCommand.execute(expenseList, ui);
                     storage.save(expenseList);
 
                 } catch (NumberFormatException e) {
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                    System.out.println("Amount must be a valid number.");
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    ui.showInvalidAmount();
                 }
                 break;
             case "exit":
-                isExit = true;
+                Command exitCommand = new ExitCommand(ui);
+                exitCommand.execute(expenseList);
                 storage.save(expenseList);
-                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                isExit = exitCommand.isExit();
                 break;
             case "delete":
                 String[] deleteParts = fullCommand.split("\\s+");
                 if (deleteParts.length < 2) {
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                    System.out.println("Usage: delete <index>");
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    ui.showDeleteUsage();
                     break;
                 }
-
                 try {
                     int index = Integer.parseInt(deleteParts[1]);
                     // Assuming you create a DeleteExpense class similar to AddExpense
                     DeleteExpense deleteCommand = new DeleteExpense(index);
-                    deleteCommand.execute(expenseList);
+                    deleteCommand.execute(expenseList, ui);
                     storage.save(expenseList); // Save immediately after deletion
 
                 } catch (NumberFormatException e) {
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                    System.out.println("Index must be a valid integer.");
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    ui.showInvalidIndexFormat();
                 }
                 break;
             default:
-                System.out.println("Unknown command. Type 'help' to see available commands.");
+                ui.showUnknownCommand();
                 break;
             }
         }
         scanner.close();
-    }
-
-    /**
-     * Prints the help menu showing all available commands and their formats.
-     */
-    private static void printHelp() {
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        System.out.println("Here are the available commands:");
-        System.out.println("  add AMOUNT DESCRIPTION  - Add a new expense");
-        System.out.println("  list                    - List all expenses");
-        System.out.println("  delete INDEX            - Delete an expense by index");
-        System.out.println("  help                    - Show this help menu");
-        System.out.println("  exit                    - Exit the application");
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    }
-
-    /**
-     * Prints all current expenses to the user
-     */
-    private void printAllExpenses() {
-        if (expenseList.getSize() == 0) {
-            System.out.println("Your expense list is currently empty.");
-            return;
-        }
-
-        System.out.println("Here are your tracked expenses:");
-        for (int i = 0; i < expenseList.getSize(); i++) {
-            System.out.println((i + 1) + ". " + expenseList.getExpense(i).toString());
-        }
     }
 
     /**
