@@ -1,3 +1,4 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Hello! I'm SpendSwift.
 What expenses are we tracking today?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
