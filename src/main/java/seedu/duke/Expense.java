@@ -15,6 +15,7 @@ public class Expense {
      * @param amount The monetary cost of the expense.
      */
     public Expense(String description, double amount) {
+        assert amount >= 0 : "Expense amount cannot be negative";
         this.description = description;
         this.amount = amount;
     }
