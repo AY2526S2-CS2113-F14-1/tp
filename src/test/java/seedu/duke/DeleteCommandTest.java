@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DeleteExpenseTest {
+public class DeleteCommandTest {
     private ExpenseList expenseList;
     private Ui ui;
 
@@ -19,7 +19,7 @@ public class DeleteExpenseTest {
     @Test
     public void execute_validIndex_removesCorrectExpense() {
         // User types "delete 1" -> refers to "Lunch"
-        DeleteExpense deleteCommand = new DeleteExpense(1);
+        DeleteCommand deleteCommand = new DeleteCommand(1);
         deleteCommand.execute(expenseList, ui);
 
         assertEquals(1, expenseList.getSize());
@@ -29,7 +29,7 @@ public class DeleteExpenseTest {
     @Test
     public void execute_invalidIndex_doesNotChangeListSize() {
         // User types "delete 5" (out of bounds)
-        DeleteExpense deleteCommand = new DeleteExpense(5);
+        DeleteCommand deleteCommand = new DeleteCommand(5);
         deleteCommand.execute(expenseList, ui);
 
         // Should handle the error gracefully and keep the list intact

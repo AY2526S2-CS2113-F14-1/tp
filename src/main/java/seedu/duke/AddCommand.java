@@ -1,6 +1,6 @@
 package seedu.duke;
 
-public class AddExpense {
+public class AddCommand {
     private String description;
     private double amount;
 
@@ -10,7 +10,7 @@ public class AddExpense {
      * @param description Description of the expense.
      * @param amount Monetary value of the expense.
      */
-    public AddExpense(String description, double amount) {
+    public AddCommand(String description, double amount) {
         this.description = description;
         this.amount = amount;
     }

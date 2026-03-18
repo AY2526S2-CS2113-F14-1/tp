@@ -3,10 +3,10 @@ package seedu.duke;
 /**
  * Handles the logic for deleting an expense.
  */
-public class DeleteExpense {
+public class DeleteCommand {
     private int index;
 
-    public DeleteExpense(int index) {
+    public DeleteCommand(int index) {
         this.index = index;
     }
 
