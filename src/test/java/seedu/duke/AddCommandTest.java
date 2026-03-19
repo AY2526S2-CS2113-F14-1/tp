@@ -2,6 +2,7 @@ package seedu.duke;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AddCommandTest {
 
@@ -39,15 +40,13 @@ public class AddCommandTest {
     }
 
     @Test
-    public void execute_zeroAmount_expenseAdded() {
-        ExpenseList expenseList = new ExpenseList();
+    public void execute_zeroAmount_throwsAssertionError() {
         Ui ui = new Ui();
-        AddCommand addCommand = new AddCommand(ui, "Free sample", 0.0);
 
-        addCommand.execute(expenseList);
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            new AddCommand(ui, "Free sample", 0.0);
+        });
 
-        assertEquals(1, expenseList.getSize());
-        assertEquals("Free sample", expenseList.getExpense(0).getDescription());
-        assertEquals(0.0, expenseList.getExpense(0).getAmount(), 0.0001);
+        assertEquals("Amount must be positive", thrown.getMessage());
     }
 }
