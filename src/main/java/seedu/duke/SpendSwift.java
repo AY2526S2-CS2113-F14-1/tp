@@ -28,72 +28,33 @@ public class SpendSwift {
      * Continuously reads user input and handles the "exit" command.
      */
     public void run() {
-        Scanner scanner = new Scanner(System.in);
         ui.showWelcome();
-
-        boolean isExit = false;
-        while (!isExit && scanner.hasNextLine()) {
-            String fullCommand = scanner.nextLine().trim();
-            if (fullCommand.isEmpty()) {
-                continue;
-            }
-
-            String commandWord = fullCommand.split(" ")[0].toLowerCase();
-
-            switch (commandWord) {
-            case "list":
-                new ListCommand(ui).execute(expenseList);
-                break;
-            case "help":
-                new HelpCommand(ui).execute(expenseList);
-                break;
-            case "add":
-                String[] parts = fullCommand.split("\\s+", 3);
-                if (parts.length < 3) {
-                    ui.showAddUsage();
-                    break;
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean isExit = false;
+            while (!isExit && scanner.hasNextLine()) {
+                String fullCommand = scanner.nextLine().trim();
+                if (fullCommand.isEmpty()) {
+                    continue;
                 }
 
-                try {
-                    double amount = Double.parseDouble(parts[1]);
-                    String description = parts[2];
+                Command command = Parser.parse(fullCommand, ui);
+                if (command == null) {
+                    continue;
+                }
 
-                    AddCommand addCommand = new AddCommand(ui, description, amount);
-                    addCommand.execute(expenseList);
+                command.execute(expenseList);
+                if (isSaveRequired(command)) {
                     storage.save(expenseList);
-
-                } catch (NumberFormatException e) {
-                    ui.showInvalidAmount();
                 }
-                break;
-            case "exit":
-                Command exitCommand = new ExitCommand(ui);
-                exitCommand.execute(expenseList);
-                storage.save(expenseList);
-                isExit = exitCommand.isExit();
-                break;
-            case "delete":
-                String[] deleteParts = fullCommand.split("\\s+");
-                if (deleteParts.length < 2) {
-                    ui.showDeleteUsage();
-                    break;
-                }
-                try {
-                    int index = Integer.parseInt(deleteParts[1]);
-                    DeleteCommand deleteCommand = new DeleteCommand(ui, index);
-                    deleteCommand.execute(expenseList);
-                    storage.save(expenseList);
-
-                } catch (NumberFormatException e) {
-                    ui.showInvalidIndexFormat();
-                }
-                break;
-            default:
-                ui.showUnknownCommand();
-                break;
+                isExit = command.isExit();
             }
         }
-        scanner.close();
+    }
+
+    private boolean isSaveRequired(Command command) {
+        return command instanceof AddCommand
+                || command instanceof DeleteCommand
+                || command instanceof ExitCommand;
     }
 
     /**
