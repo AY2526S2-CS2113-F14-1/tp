@@ -124,6 +124,23 @@ public class Parser {
                 return null;
             }
 
+        case "budget":
+            if (arguments.isEmpty()) {
+                ui.showBudgetUsage();
+                return null;
+            }
+            try {
+                double budgetAmount = Double.parseDouble(arguments);
+                if (budgetAmount < 0) {
+                    ui.showInvalidBudget();
+                    return null;
+                }
+                return new BudgetCommand(ui, budgetAmount);
+            } catch (NumberFormatException e) {
+                ui.showInvalidBudget();
+                return null;
+            }
+
         case "delete":
             if (arguments.isEmpty()) {
                 ui.showDeleteUsage();
