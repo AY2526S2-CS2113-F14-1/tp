@@ -43,6 +43,9 @@ public class AddCommand extends Command {
         Expense expense = new Expense(description, amount, category, date);
         expenseList.addExpense(expense);
         ui.showAddExpense(expense, expenseList.getSize());
+        if (expenseList.isOverBudget()) {
+            ui.showBudgetExceededWarning(expenseList.getBudget(), expenseList.getTotalAmount());
+        }
     }
 
     /**

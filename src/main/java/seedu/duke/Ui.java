@@ -53,6 +53,7 @@ public class Ui {
         System.out.println("Here are the available commands:");
         System.out.println("  add AMOUNT DESCRIPTION  - Add a new expense");
         System.out.println("  list                    - List all expenses");
+        System.out.println("  budget AMOUNT           - Set a spending budget");
         System.out.println("  total                   - Calculate the total amount spent");
         System.out.println("  delete INDEX            - Delete an expense by index");
         System.out.println("  help                    - Show this help menu");
@@ -69,6 +70,7 @@ public class Ui {
         System.out.println(LINE);
         if (expenseList.getSize() == 0) {
             System.out.println("Your expense list is currently empty.");
+            System.out.println(LINE);
             return;
         }
         System.out.println("Here are your tracked expenses:");
@@ -191,6 +193,49 @@ public class Ui {
         System.out.println(LINE);
         System.out.println("You have " + count + " expense(s) in your list.");
         System.out.println("Your total spending is: $" + String.format("%.2f", total));
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays a confirmation message when a budget is successfully set.
+     *
+     * @param budget The budget amount that was set.
+     */
+    public void showBudgetSet(double budget) {
+        System.out.println(LINE);
+        System.out.println("Budget set to $" + String.format("%.2f", budget));
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays a warning message when the total spending exceeds the budget.
+     *
+     * @param budget The budget limit.
+     * @param total The current total spending.
+     */
+    public void showBudgetExceededWarning(double budget, double total) {
+        System.out.println(LINE);
+        System.out.println("Warning: You have exceeded your budget of $"
+                + String.format("%.2f", budget) + "!");
+        System.out.println("Current total: $" + String.format("%.2f", total));
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays the correct usage format for the budget command.
+     */
+    public void showBudgetUsage() {
+        System.out.println(LINE);
+        System.out.println("Usage: budget AMOUNT");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays an error message when the budget input is invalid.
+     */
+    public void showInvalidBudget() {
+        System.out.println(LINE);
+        System.out.println("Budget must be a valid non-negative number.");
         System.out.println(LINE);
     }
 }

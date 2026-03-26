@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Handles reading and writing expense data to a text file
- * so that data persists between sessions.
+ * Handles reading and writing expense data to a file
+ * to ensure data persists between application sessions.
  */
 public class Storage {
     private static final String SEPARATOR = " | ";
@@ -37,7 +37,7 @@ public class Storage {
     }
 
     /**
-     * Loads expenses from the data file into the given ExpenseList.
+     * Loads expenses and budget data from the file into the given ExpenseList.
      * If the file does not exist, an empty list is returned.
      * Supports loading both v1.0 and v2.0 save file formats.
      *
@@ -57,6 +57,20 @@ public class Storage {
                 if (line.isEmpty()) {
                     continue;
                 }
+
+                if (line.startsWith("BUDGET" + SEPARATOR)) {
+                    String budgetString = line.substring(("BUDGET" + SEPARATOR).length()).trim();
+                    try {
+                        double budget = Double.parseDouble(budgetString);
+                        if (budget >= 0) {
+                            expenseList.setBudget(budget);
+                        }
+                    } catch (NumberFormatException e) {
+                        ui.showMalformedLineWarning(line);
+                    }
+                    continue;
+                }
+
                 Expense expense = parseLine(line);
                 if (expense != null) {
                     expenseList.addExpense(expense);
@@ -69,9 +83,10 @@ public class Storage {
     }
 
     /**
-     * Saves all expenses from the given ExpenseList to the data file.
+     * Saves all expenses and budget data from the given ExpenseList to the file.
      * Creates the parent directory if it does not exist.
-     * Saves using the v2.0 format: AMOUNT | DATE | CATEGORY | DESCRIPTION.
+     * Saves using the v2.0 format: AMOUNT | DATE | CATEGORY | DESCRIPTION,
+     * with an optional budget line.
      *
      * @param expenseList The ExpenseList whose data should be saved.
      */
@@ -90,6 +105,11 @@ public class Storage {
             }
         }
         try (FileWriter writer = new FileWriter(file)) {
+
+            if (expenseList.hasBudget()) {
+                writer.write("BUDGET" + SEPARATOR + expenseList.getBudget() + System.lineSeparator());
+            }
+
             for (int i = 0; i < expenseList.getSize(); i++) {
                 Expense expense = expenseList.getExpense(i);
                 // NEW FORMAT: AMOUNT | DATE | CATEGORY | DESCRIPTION
