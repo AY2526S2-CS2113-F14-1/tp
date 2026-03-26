@@ -44,7 +44,6 @@ public class StatisticsCommand extends Command {
             totals.put(category, current + expense.getAmount());
         }
 
-        assert totals != null : "Totals map should never be null";
         ui.showStatistics(totals, expenseList.getSize());
     }
 
