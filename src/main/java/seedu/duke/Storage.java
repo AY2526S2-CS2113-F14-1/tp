@@ -43,6 +43,8 @@ public class Storage {
         }
         this.filePath = filePath;
         this.ui = ui;
+        assert !this.filePath.trim().isEmpty() : "Storage file path should be initialised";
+        assert this.ui != null : "Storage UI should be initialised";
     }
     /**
      * Loads expenses from the data file into the given ExpenseList.
@@ -114,6 +116,7 @@ public class Storage {
             }
             for (int i = 0; i < expenseList.getSize(); i++) {
                 Expense expense = expenseList.getExpense(i);
+                assert expense != null : "Stored expenses should never contain null values";
                 writer.write(
                         expense.getAmount()
                                 + SEPARATOR + expense.getDate()
@@ -160,6 +163,7 @@ public class Storage {
                     logger.warning("Storage line with empty description skipped: " + line);
                     return null;
                 }
+                assert !description.isEmpty() : "Parsed description should not be empty after validation";
                 return new Expense(description, amount, category, date);
             } else {
                 ui.showMalformedLineWarning(line);

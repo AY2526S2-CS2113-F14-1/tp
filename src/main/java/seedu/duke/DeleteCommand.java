@@ -24,10 +24,12 @@ public class DeleteCommand extends Command {
      */
     @Override
     public void execute(ExpenseList expenseList) {
+        assert expenseList != null : "ExpenseList must not be null";
         if (index <= 0) {
             ui.showInvalidIndex();
             return;
         }
+        assert index > 0 : "Index should be positive after validation";
         try {
             // Convert 1-based user input to 0-based index
             Expense removed = expenseList.deleteExpense(index - 1);

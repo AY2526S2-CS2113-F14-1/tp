@@ -10,6 +10,7 @@ public class ExpenseList {
     public ExpenseList() {
         this.expenses = new ArrayList<>();
         this.budget = -1;
+        assert this.expenses != null : "Expenses list should be initialised in constructor";
     }
     /**
      * Adds a new expense to the end of the list.
@@ -20,7 +21,9 @@ public class ExpenseList {
         if (expense == null) {
             throw new IllegalArgumentException("Expense must not be null");
         }
+        assert expense != null : "Expense should be validated before adding";
         expenses.add(expense);
+        assert expenses.get(expenses.size() - 1) == expense : "Expense should be at end of list after add";
     }
     /**
      * Returns the current number of expenses in the list.

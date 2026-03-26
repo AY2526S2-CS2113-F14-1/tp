@@ -18,6 +18,7 @@ public abstract class Command {
             throw new IllegalArgumentException("Ui must not be null");
         }
         this.ui = ui;
+        assert this.ui != null : "UI should be initialised after null check";
     }
 
     /**

@@ -40,6 +40,7 @@ public class Parser {
         String[] parts = trimmedCommand.split("\\s+", 2);
         String commandWord = parts[0].toLowerCase();
         String arguments = parts.length > 1 ? parts[1].trim() : "";
+        assert !commandWord.isEmpty() : "Command word should not be empty after trimming";
 
         switch (commandWord) {
         case "list":
@@ -177,6 +178,7 @@ public class Parser {
             ui.showAddUsage();
             return null;
         }
+        assert !description.isEmpty() : "Description should not be empty after validation";
 
         return new AddCommand(ui, description, amount, category, date);
     }
@@ -199,6 +201,7 @@ public class Parser {
                 ui.showInvalidIndex();
                 return null;
             }
+            assert index > 0 : "Delete index should be positive after validation";
             return new DeleteCommand(ui, index);
         } catch (NumberFormatException e) {
             ui.showInvalidIndexFormat();

@@ -29,11 +29,14 @@ public class Expense {
         }
         assert amount >= 0 : "Expense amount cannot be negative";
         this.description = description.trim();
+        assert !this.description.isEmpty() : "Description should not be empty after trimming";
         this.amount = amount;
         this.category = (category == null || category.trim().isEmpty())
                 ? DEFAULT_CATEGORY
                 : category.trim();
+        assert this.category != null && !this.category.isEmpty() : "Category should not be empty after assignment";
         this.date = (date == null) ? LocalDate.now() : date;
+        assert this.date != null : "Date should not be null after assignment";
     }
     /**
      * Constructs an Expense using the default category "Others" and today's date.
