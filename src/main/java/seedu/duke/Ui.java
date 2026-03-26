@@ -5,7 +5,7 @@ package seedu.duke;
  * Responsible for displaying messages, prompts, and feedback to the user.
  */
 public class Ui {
-    private static final String LINE = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    private static final String LINE = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
     /**
      * Displays the welcome message when the application starts.
