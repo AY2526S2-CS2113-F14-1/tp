@@ -8,6 +8,33 @@
 
 {Describe the design and implementation of the product. Use UML diagrams and short code snippets where applicable.}
 
+### Delete Feature
+
+The delete feature allows users to remove an existing expense from their tracking list by providing its 1-based index (e.g., `delete 1`).
+
+**How it works:**
+
+The user types `delete` followed by a single positive integer representing the expense's index.
+
+**Implementation:**
+
+`Parser.parseDeleteCommand()` splits the input string. It first verifies there is exactly one argument and then attempts to parse it into an integer. If the argument is missing, non-numeric, or zero/negative, it catches the parsing issues (or returns `null`) and tells `Ui` to show an invalid index message.
+
+A valid integer index results in the instantiation of a `DeleteCommand`.
+
+Below is the sequence of interactions when the user enters a valid command like `delete 1`:
+
+*Figure 1: Sequence Diagram detailing the Delete feature execution.*
+![Sequence Diagram for Delete Command](images/delete-expense-diagram.png)
+
+`DeleteCommand.execute()` operates by:
+1. Validating that the given index is greater than `0`.
+2. Attempting to call `ExpenseList.deleteExpense(index - 1)`. 
+3. Catching an `IndexOutOfBoundsException` if the index given is larger than the actual list's bounds, showing an error via the `Ui`.
+4. Successfully removing the item and showing a success message via `Ui.showDeleteExpense()`.
+
+Because deletion permanently removes persisted data, `DeleteCommand.shouldPersist()` returns `true`, triggering a file save sequentially.
+
 ### Edit Expense Feature
 
 The edit feature allows users to modify one or more fields of an existing expense using the `edit` command.
@@ -65,7 +92,7 @@ When `AddCommand#execute(ExpenseList)` is invoked, it first evaluates the `categ
 2. It passes this list to `Ui#showCategoryPrompt()`, which formats and prints a numbered list to the terminal.
 3. `AddCommand` then suspends execution by calling `Ui#getUserInput()`, waiting for the user to type their selection.
 
-*Figure 1: Sequence Diagram detailing the UI Interaction phase.*
+*Figure 2: Sequence Diagram detailing the UI Interaction phase.*
 ![Phase 1 Sequence Diagram](images/interactive-category-phase1.png)
 
 #### Phase 2: Dynamic Category Resolution
@@ -73,7 +100,7 @@ Once the user provides an input string, `AddCommand` must determine if the user 
 
 If the user types a new category name (e.g., "Snacks"), `AddCommand` delegates the formatting and storage to `ExpenseList`. The `ExpenseList#addCategory()` method formats the string to Title Case (e.g., "snacks" -> "Snacks") and dynamically inserts it into the master list just above the "Others" category. This ensures "Others" always remains safely at the bottom of the user's UI prompt.
 
-*Figure 2: Sequence Diagram detailing the parsing and dynamic storage of a new category.*
+*Figure 3: Sequence Diagram detailing the parsing and dynamic storage of a new category.*
 ![Phase 2 Sequence Diagram](images/interactive-category-phase2.png)
 
 #### Phase 3: Expense Finalization & Budget Checking
@@ -84,7 +111,7 @@ With the category definitively resolved (either extracted from the numbered list
 3. `Ui#showAddExpense()` is called to print the success confirmation.
 4. Finally, `AddCommand` queries `ExpenseList#isOverBudget()`. If the new expense pushes the total over the user's defined limit, it triggers a warning message via the `Ui`.
 
-*Figure 3: Sequence Diagram detailing the final object creation and budget validation.*
+*Figure 4: Sequence Diagram detailing the final object creation and budget validation.*
 ![Phase 3 Sequence Diagram](images/interactive-category-phase3.png)
 
 
@@ -128,35 +155,13 @@ The user types `sort` followed by exactly one criterion — `category` or `date`
 
 Below is the sequence of interactions when the user enters `sort category`:
 
-```
-@startuml
-actor User
-participant "Parser" as P
-participant "SortCommand" as SC
-participant "ExpenseList" as EL
-participant "Ui" as UI
+*Figure 5: Sequence Diagram detailing the Sort feature execution.*
+![SortCommand Sequence Diagram](images/sort-uml.png)
 
-User -> P : parse("sort category", ui)
-P -> P : commandWord = "sort"
-P -> P : arguments = "category"
-P -> SC : new SortCommand(ui, "category")
-SC --> P : sortCommand
-P --> User : sortCommand
+`SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `java.util.Collections.sort(expenses, comparator)` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
 
-User -> SC : execute(expenseList)
-SC -> EL : sortExpenses(BY_CATEGORY)
-EL -> EL : expenses.sort(comparator)
-EL --> SC : (sorted in place)
-SC -> UI : showSorted(expenseList, "category")
-UI --> SC : (list printed)
-SC --> User : (done)
-@enduml
-```
-
-`SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `ArrayList.sort()` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
-
-- `BY_CATEGORY` — uses `String.CASE_INSENSITIVE_ORDER` on `Expense.getCategory()`.
-- `BY_DATE` — uses the natural order of `LocalDate` via `Expense.getDate()`.
+- `BY_CATEGORY` — uses `String.CASE_INSENSITIVE_ORDER` on `Expense.getCategory()`, with a fallback to sort by date (newest first) using `.thenComparing(Expense::getDate, Comparator.reverseOrder())`.
+- `BY_DATE` — uses the reverse natural order of `LocalDate` via `Expense.getDate()` so the newest expenses appear first.
 
 Because the sort modifies the list order that is persisted to file, `SortCommand.shouldPersist()` returns `true`, triggering a save after execution.
 
@@ -180,33 +185,8 @@ The user types `stats` with no arguments. Trailing text is not allowed; if any a
 
 Below is the sequence of interactions when the user enters `stats`:
 
-```
-@startuml
-actor User
-participant "Parser" as P
-participant "StatisticsCommand" as STC
-participant "ExpenseList" as EL
-participant "Ui" as UI
-
-User -> P : parse("stats", ui)
-P -> P : commandWord = "stats"
-P -> P : arguments = "" (empty)
-P -> STC : new StatisticsCommand(ui)
-STC --> P : statsCommand
-P --> User : statsCommand
-
-User -> STC : execute(expenseList)
-STC -> STC : totals = new LinkedHashMap<>()
-loop for each expense in expenseList
-    STC -> EL : getExpense(i)
-    EL --> STC : expense
-    STC -> STC : totals.merge(category, amount)
-end
-STC -> UI : showStatistics(totals, count)
-UI --> STC : (stats printed)
-STC --> User : (done)
-@enduml
-```
+*Figure 6: Sequence Diagram detailing the Statistics feature execution.*
+![StatisticsCommand Sequence Diagram](images/statistics-uml.png)
 
 `StatisticsCommand.execute()` iterates over every expense in the list and accumulates per-category totals into a `LinkedHashMap<String, Double>`. Using a `LinkedHashMap` preserves the **insertion order**, so categories are printed in the order they first appear in the list — giving the output a predictable, intuitive feel.
 
