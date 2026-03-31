@@ -24,8 +24,8 @@ A valid integer index results in the instantiation of a `DeleteCommand`.
 
 Below is the sequence of interactions when the user enters a valid command like `delete 1`:
 
-*Figure 4: Sequence Diagram detailing the Delete feature execution.*
-![DeleteCommand Sequence Diagram](images/delete-sequence-diagram.png)
+*Figure 1: Sequence Diagram detailing the Delete feature execution.*
+![Sequence Diagram for Delete Command](images/delete-expense-diagram.png)
 
 `DeleteCommand.execute()` operates by:
 1. Validating that the given index is greater than `0`.
@@ -92,7 +92,7 @@ When `AddCommand#execute(ExpenseList)` is invoked, it first evaluates the `categ
 2. It passes this list to `Ui#showCategoryPrompt()`, which formats and prints a numbered list to the terminal.
 3. `AddCommand` then suspends execution by calling `Ui#getUserInput()`, waiting for the user to type their selection.
 
-*Figure 1: Sequence Diagram detailing the UI Interaction phase.*
+*Figure 2: Sequence Diagram detailing the UI Interaction phase.*
 ![Phase 1 Sequence Diagram](images/interactive-category-phase1.png)
 
 #### Phase 2: Dynamic Category Resolution
@@ -100,7 +100,7 @@ Once the user provides an input string, `AddCommand` must determine if the user 
 
 If the user types a new category name (e.g., "Snacks"), `AddCommand` delegates the formatting and storage to `ExpenseList`. The `ExpenseList#addCategory()` method formats the string to Title Case (e.g., "snacks" -> "Snacks") and dynamically inserts it into the master list just above the "Others" category. This ensures "Others" always remains safely at the bottom of the user's UI prompt.
 
-*Figure 2: Sequence Diagram detailing the parsing and dynamic storage of a new category.*
+*Figure 3: Sequence Diagram detailing the parsing and dynamic storage of a new category.*
 ![Phase 2 Sequence Diagram](images/interactive-category-phase2.png)
 
 #### Phase 3: Expense Finalization & Budget Checking
@@ -111,7 +111,7 @@ With the category definitively resolved (either extracted from the numbered list
 3. `Ui#showAddExpense()` is called to print the success confirmation.
 4. Finally, `AddCommand` queries `ExpenseList#isOverBudget()`. If the new expense pushes the total over the user's defined limit, it triggers a warning message via the `Ui`.
 
-*Figure 3: Sequence Diagram detailing the final object creation and budget validation.*
+*Figure 4: Sequence Diagram detailing the final object creation and budget validation.*
 ![Phase 3 Sequence Diagram](images/interactive-category-phase3.png)
 
 
@@ -156,7 +156,7 @@ The user types `sort` followed by exactly one criterion — `category` or `date`
 Below is the sequence of interactions when the user enters `sort category`:
 
 *Figure 5: Sequence Diagram detailing the Sort feature execution.*
-![SortCommand Sequence Diagram](images/sort-sequence-diagram.png)
+![SortCommand Sequence Diagram](images/sort-uml.png)
 
 `SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `java.util.Collections.sort(expenses, comparator)` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
 
@@ -186,7 +186,7 @@ The user types `stats` with no arguments. Trailing text is not allowed; if any a
 Below is the sequence of interactions when the user enters `stats`:
 
 *Figure 6: Sequence Diagram detailing the Statistics feature execution.*
-![StatisticsCommand Sequence Diagram](images/statistics-sequence-diagram.png)
+![StatisticsCommand Sequence Diagram](images/statistics-uml.png)
 
 `StatisticsCommand.execute()` iterates over every expense in the list and accumulates per-category totals into a `LinkedHashMap<String, Double>`. Using a `LinkedHashMap` preserves the **insertion order**, so categories are printed in the order they first appear in the list — giving the output a predictable, intuitive feel.
 
