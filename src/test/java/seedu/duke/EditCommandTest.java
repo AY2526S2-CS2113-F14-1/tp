@@ -2,8 +2,10 @@ package seedu.duke;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EditCommandTest {
 
@@ -99,5 +101,36 @@ public class EditCommandTest {
     public void constructor_nullUi_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new EditCommand(null, 1, 5.00, "Lunch", null, null));
+    }
+
+    @Test
+    public void execute_editDateOnly_updatesDateCorrectly() {
+        LocalDate newDate = LocalDate.of(2026, 1, 15);
+        EditCommand command = new EditCommand(ui, 1, null, null, null, newDate);
+        command.execute(expenseList);
+
+        Expense updated = expenseList.getExpense(0);
+        assertEquals(newDate, updated.getDate());
+        assertEquals("Chicken Rice", updated.getDescription());
+        assertEquals(3.50, updated.getAmount());
+    }
+
+    @Test
+    public void execute_editAllFourFields_updatesAllCorrectly() {
+        LocalDate newDate = LocalDate.of(2026, 6, 1);
+        EditCommand command = new EditCommand(ui, 1, 8.00, "Laksa", "Food", newDate);
+        command.execute(expenseList);
+
+        Expense updated = expenseList.getExpense(0);
+        assertEquals("Laksa", updated.getDescription());
+        assertEquals(8.00, updated.getAmount());
+        assertEquals("Food", updated.getCategory());
+        assertEquals(newDate, updated.getDate());
+    }
+
+    @Test
+    public void shouldPersist_returnsTrue() {
+        EditCommand command = new EditCommand(ui, 1, 5.00, null, null, null);
+        assertTrue(command.shouldPersist());
     }
 }

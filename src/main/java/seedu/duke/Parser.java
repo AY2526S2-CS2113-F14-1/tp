@@ -9,6 +9,7 @@ import java.time.format.ResolverStyle;
  * Parses raw user input strings into executable Command objects.
  * Both add and edit commands use /c for category and /da for date.
  * The edit command additionally uses /a for amount and /de for description.
+ * The lend command uses /da for date.
  */
 public class Parser {
 
@@ -116,6 +117,15 @@ public class Parser {
                 return null;
             }
             return new StatisticsCommand(ui);
+
+        case "lend":
+            return parseLendCommand(arguments, ui);
+
+        case "loans":
+            return parseLoansCommand(arguments, ui);
+
+        case "repay":
+            return parseRepayCommand(arguments, ui);
 
         default:
             ui.showUnknownCommand();
@@ -359,6 +369,137 @@ public class Parser {
     }
 
     /**
+     * Parses the argument string for the lend command and returns a LendCommand.
+     * Expects the format: lend AMOUNT BORROWER_NAME [/da DATE].
+     *
+     * @param arguments The portion of user input after the lend keyword.
+     * @param ui        The Ui instance used to display error or usage messages.
+     * @return A fully constructed LendCommand, or null if the input is invalid.
+     */
+    private static Command parseLendCommand(String arguments, Ui ui) {
+        if (arguments.isEmpty()) {
+            ui.showLendUsage();
+            return null;
+        }
+
+        String[] inputParts = arguments.split("\\s+", 2);
+        if (inputParts.length < 2) {
+            ui.showLendUsage();
+            return null;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(inputParts[0]);
+        } catch (NumberFormatException e) {
+            ui.showInvalidAmount();
+            return null;
+        }
+
+        if (Double.isNaN(amount) || Double.isInfinite(amount)) {
+            ui.showInvalidAmount();
+            return null;
+        }
+        if (amount == 0) {
+            ui.showZeroAmountWarning();
+            return null;
+        }
+        if (amount < 0) {
+            ui.showInvalidAmount();
+            return null;
+        }
+
+        String remainingText = inputParts[1].trim();
+
+        LocalDate date = null;
+        if (remainingText.contains("/da")) {
+            int flagIndex = remainingText.indexOf("/da");
+            String afterFlag = remainingText.substring(flagIndex + "/da".length()).trim();
+            String[] tokens = afterFlag.split("\\s+", 2);
+
+            if (tokens[0].isEmpty()) {
+                ui.showLendUsage();
+                return null;
+            }
+            date = parseDate(tokens[0], ui);
+            if (date == null) {
+                return null;
+            }
+            String beforeFlag = remainingText.substring(0, flagIndex).trim();
+            String afterDate = tokens.length > 1 ? tokens[1].trim() : "";
+            remainingText = (beforeFlag + " " + afterDate).trim();
+        }
+
+        String borrowerName = remainingText.trim();
+        if (borrowerName.isEmpty() || borrowerName.startsWith("/")) {
+            ui.showLendUsage();
+            return null;
+        }
+
+        assert amount > 0 : "Amount should be positive after all validation";
+        assert !borrowerName.isEmpty() : "Borrower name should not be empty after validation";
+
+        return new LendCommand(ui, borrowerName, amount, date);
+    }
+
+    /**
+     * Parses the argument string for the loans command.
+     * Accepts no arguments (outstanding only) or /all (include repaid).
+     *
+     * @param arguments The portion of user input after the loans keyword.
+     * @param ui        The Ui instance used to display error or usage messages.
+     * @return A LoansCommand, or null if the argument is unrecognised.
+     */
+    private static Command parseLoansCommand(String arguments, Ui ui) {
+        if (arguments.isEmpty()) {
+            return new LoansCommand(ui, false);
+        }
+        if (arguments.equals("/all")) {
+            return new LoansCommand(ui, true);
+        }
+        ui.showLoansUsage();
+        return null;
+    }
+
+    /**
+     * Parses the argument string for the repay command and returns a RepayCommand.
+     * Expects a single positive integer index with no trailing tokens.
+     *
+     * @param arguments The portion of user input after the repay keyword.
+     * @param ui        The Ui instance used to display error or usage messages.
+     * @return A fully constructed RepayCommand, or null if the input is invalid.
+     */
+    private static Command parseRepayCommand(String arguments, Ui ui) {
+        if (arguments.isEmpty()) {
+            ui.showRepayUsage();
+            return null;
+        }
+
+        String[] tokens = arguments.split("\\s+");
+        if (tokens.length > 1) {
+            ui.showRepayUsage();
+            return null;
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(tokens[0]);
+        } catch (NumberFormatException e) {
+            ui.showInvalidIndexFormat();
+            return null;
+        }
+
+        if (index <= 0) {
+            ui.showInvalidIndex();
+            return null;
+        }
+
+        assert index > 0 : "Repay index should be positive after validation";
+        return new RepayCommand(ui, index);
+    }
+
+
+    /**
      * Parses a date string strictly following the YYYY-MM-DD format.
      * Impossible calendar dates are also rejected.
      * Calls showInvalidDateFormat and returns null on failure.
@@ -376,4 +517,3 @@ public class Parser {
         }
     }
 }
-
