@@ -24,29 +24,8 @@ A valid integer index results in the instantiation of a `DeleteCommand`.
 
 Below is the sequence of interactions when the user enters a valid command like `delete 1`:
 
-```
-@startuml
-actor User
-participant "Parser" as P
-participant "DeleteCommand" as DC
-participant "ExpenseList" as EL
-participant "Ui" as UI
-
-User -> P : parse("delete 1", ui)
-P -> P : Integer.parseInt("1")
-P -> DC : new DeleteCommand(ui, 1)
-DC --> P : deleteCommand
-P --> User : deleteCommand
-
-User -> DC : execute(expenseList)
-DC -> EL : deleteExpense(0)
-EL -> EL : expenses.remove(0)
-EL --> DC : removedExpense
-DC -> UI : showDeleteExpense(removedExpense, size)
-UI --> DC : (confirmation printed)
-DC --> User : (done)
-@enduml
-```
+*Figure 4: Sequence Diagram detailing the Delete feature execution.*
+![DeleteCommand Sequence Diagram](images/delete-sequence-diagram.png)
 
 `DeleteCommand.execute()` operates by:
 1. Validating that the given index is greater than `0`.
@@ -176,30 +155,8 @@ The user types `sort` followed by exactly one criterion — `category` or `date`
 
 Below is the sequence of interactions when the user enters `sort category`:
 
-```
-@startuml
-actor User
-participant "Parser" as P
-participant "SortCommand" as SC
-participant "ExpenseList" as EL
-participant "Ui" as UI
-
-User -> P : parse("sort category", ui)
-P -> P : commandWord = "sort"
-P -> P : arguments = "category"
-P -> SC : new SortCommand(ui, "category")
-SC --> P : sortCommand
-P --> User : sortCommand
-
-User -> SC : execute(expenseList)
-SC -> EL : sortExpenses(BY_CATEGORY)
-EL -> EL : java.util.Collections.sort(expenses, comparator)
-EL --> SC : (sorted in place)
-SC -> UI : showSorted(expenseList, "category")
-UI --> SC : (list printed)
-SC --> User : (done)
-@enduml
-```
+*Figure 5: Sequence Diagram detailing the Sort feature execution.*
+![SortCommand Sequence Diagram](images/sort-sequence-diagram.png)
 
 `SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `java.util.Collections.sort(expenses, comparator)` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
 
@@ -228,33 +185,8 @@ The user types `stats` with no arguments. Trailing text is not allowed; if any a
 
 Below is the sequence of interactions when the user enters `stats`:
 
-```
-@startuml
-actor User
-participant "Parser" as P
-participant "StatisticsCommand" as STC
-participant "ExpenseList" as EL
-participant "Ui" as UI
-
-User -> P : parse("stats", ui)
-P -> P : commandWord = "stats"
-P -> P : arguments = "" (empty)
-P -> STC : new StatisticsCommand(ui)
-STC --> P : statsCommand
-P --> User : statsCommand
-
-User -> STC : execute(expenseList)
-STC -> STC : totals = new LinkedHashMap<>()
-loop for each expense in expenseList
-    STC -> EL : getExpense(i)
-    EL --> STC : expense
-    STC -> STC : totals.merge(category, amount)
-end
-STC -> UI : showStatistics(totals, count)
-UI --> STC : (stats printed)
-STC --> User : (done)
-@enduml
-```
+*Figure 6: Sequence Diagram detailing the Statistics feature execution.*
+![StatisticsCommand Sequence Diagram](images/statistics-sequence-diagram.png)
 
 `StatisticsCommand.execute()` iterates over every expense in the list and accumulates per-category totals into a `LinkedHashMap<String, Double>`. Using a `LinkedHashMap` preserves the **insertion order**, so categories are printed in the order they first appear in the list — giving the output a predictable, intuitive feel.
 
