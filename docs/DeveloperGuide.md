@@ -46,6 +46,60 @@ Whatever text remains after both flags are removed becomes the description, whic
 
 If no category is supplied, `Expense` defaults to `"Others"`. If no date is supplied, it defaults to today's date via `LocalDate.now()`.
 
+### Interactive Category Selection
+
+**Overview**
+The application features a dynamic, interactive category selection mechanism. When a user attempts to add an expense without explicitly providing a category flag (`/c`), the application gracefully pauses execution, displays a numbered list of available categories, and prompts the user to select an existing category or input a new one.
+
+This feature ensures that users do not accidentally pollute a default "Others" category due to forgetfulness, maintaining the integrity of their financial tracking while providing a seamless User Experience (UX).
+
+**Implementation**
+The interactive category selection mechanism is primarily orchestrated by the `AddCommand` class, acting as the controller. It interacts heavily with the `Ui` class for presentation and the `ExpenseList` class for state management.
+
+To ensure the architecture remains decoupled and follows the Single Responsibility Principle, the execution flow is broken down into three distinct phases: **UI Interaction**, **Category Resolution**, and **Expense Finalization**.
+
+#### Phase 1: The UI Interaction Prompt
+When `AddCommand#execute(ExpenseList)` is invoked, it first evaluates the `category` field parsed from the user's initial input. If this field is `null`, the command intercepts the normal execution flow to query the user.
+
+1. `AddCommand` fetches the current master list of categories from `ExpenseList`.
+2. It passes this list to `Ui#showCategoryPrompt()`, which formats and prints a numbered list to the terminal.
+3. `AddCommand` then suspends execution by calling `Ui#getUserInput()`, waiting for the user to type their selection.
+
+*Figure 1: Sequence Diagram detailing the UI Interaction phase.*
+![Phase 1 Sequence Diagram](images/interactive-category-phase1.png)
+
+#### Phase 2: Dynamic Category Resolution
+Once the user provides an input string, `AddCommand` must determine if the user typed a number (selecting an existing category) or a word (creating a brand new category).
+
+If the user types a new category name (e.g., "Snacks"), `AddCommand` delegates the formatting and storage to `ExpenseList`. The `ExpenseList#addCategory()` method formats the string to Title Case (e.g., "snacks" -> "Snacks") and dynamically inserts it into the master list just above the "Others" category. This ensures "Others" always remains safely at the bottom of the user's UI prompt.
+
+*Figure 2: Sequence Diagram detailing the parsing and dynamic storage of a new category.*
+![Phase 2 Sequence Diagram](images/interactive-category-phase2.png)
+
+#### Phase 3: Expense Finalization & Budget Checking
+With the category definitively resolved (either extracted from the numbered list or dynamically created), the `AddCommand` proceeds to finalize the data mutation.
+
+1. A new `Expense` object is instantiated with the resolved category.
+2. The object is appended to the `ExpenseList` via `addExpense()`.
+3. `Ui#showAddExpense()` is called to print the success confirmation.
+4. Finally, `AddCommand` queries `ExpenseList#isOverBudget()`. If the new expense pushes the total over the user's defined limit, it triggers a warning message via the `Ui`.
+
+*Figure 3: Sequence Diagram detailing the final object creation and budget validation.*
+![Phase 3 Sequence Diagram](images/interactive-category-phase3.png)
+
+
+**Design Considerations: Why it was implemented this way**
+* **Strict Decoupling (Single Responsibility Principle):** The `AddCommand` acts strictly as an orchestrator. The `Ui` class knows nothing about how categories are saved, and the `ExpenseList` class knows nothing about `Scanner` inputs. They never communicate directly, which makes the codebase highly testable and modular.
+* **The Open-Closed Principle for Categories:** Instead of hardcoding categories inside a Java `Enum` (which would require a code rewrite to add new ones), storing a dynamic `ArrayList<String>` inside `ExpenseList` allows the application to grow with the user's personalized spending habits.
+
+**Alternatives Considered**
+* **Alternative 1 (Strict Formatting Validation):** * *Design:* Throw an `IllegalArgumentException` in the `Parser` if the `/c` flag is missing, forcing the user to retype the entire command.
+   * *Pros:* Very easy to implement. Keeps `AddCommand` execution strictly linear without needing pauses.
+   * *Cons:* Creates a highly frustrating User Experience (UX). Power users typing quickly will constantly hit validation errors for forgetting a simple flag.
+* **Alternative 2 (Silent Defaulting):** * *Design:* Automatically assign the expense to an "Others" category without prompting the user.
+   * *Pros:* Immediate execution; keeps the `AddCommand` logic simple.
+   * *Cons:* Leads to messy, inaccurate financial tracking. Users end up with the majority of their expenses dumped into a useless "Others" category, completely defeating the purpose of a budgeting application. The interactive prompt forces accurate categorization without making the user retype their description and amount.
+
 ### Input Validation (Strict Commands)
 
 The `list`, `help`, `exit`, and `total` commands do not accept any arguments.
