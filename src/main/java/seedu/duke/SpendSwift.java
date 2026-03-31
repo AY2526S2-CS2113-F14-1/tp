@@ -1,7 +1,5 @@
 package seedu.duke;
 
-import java.util.Scanner;
-
 /**
  * The main entry point for the SpendSwift application.
  * Initializes the application and starts the interaction loop with the user.
@@ -29,10 +27,13 @@ public class SpendSwift {
      */
     public void run() {
         ui.showWelcome();
-        try (Scanner scanner = new Scanner(System.in)) {
-            boolean isExit = false;
-            while (!isExit && scanner.hasNextLine()) {
-                String fullCommand = scanner.nextLine().trim();
+        boolean isExit = false;
+
+        while (!isExit) {
+            try {
+                // Read input exclusively through the single Ui Scanner
+                String fullCommand = ui.getUserInput();
+
                 if (fullCommand.isEmpty()) {
                     continue;
                 }
@@ -47,6 +48,11 @@ public class SpendSwift {
                     storage.save(expenseList);
                 }
                 isExit = command.isExit();
+
+            } catch (java.util.NoSuchElementException e) {
+                // Safety net: If an automated test script runs out of lines without typing "exit",
+                // this safely breaks the loop instead of crashing the build.
+                break;
             }
         }
     }

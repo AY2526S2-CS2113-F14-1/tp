@@ -7,6 +7,7 @@ import java.util.Map;
  */
 public class Ui {
     private static final String LINE = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    private final java.util.Scanner in = new java.util.Scanner(System.in);
 
     /**
      * Displays the welcome message when the application starts.
@@ -157,6 +158,16 @@ public class Ui {
     public void showInvalidAmount() {
         System.out.println(LINE);
         System.out.println("Amount must be a valid non-negative number.");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays an error when the user attempts to add a $0.00 expense.
+     */
+    public void showZeroAmountWarning() {
+        System.out.println(LINE);
+        System.out.println("Oops! Expense amounts must be greater than $0.00.");
+        System.out.println("If you didn't spend any money, there is no need to track it!");
         System.out.println(LINE);
     }
 
@@ -358,6 +369,21 @@ public class Ui {
             }
         }
         System.out.println(LINE);
+    }
+
+
+
+    public String getUserInput() {
+        return in.nextLine().trim();
+    }
+
+    public void showCategoryPrompt(java.util.ArrayList<String> categories) {
+        System.out.println(LINE);
+        System.out.println("You didn't specify a category! Choose one from the list:");
+        for (int i = 0; i < categories.size(); i++) {
+            System.out.println("  " + (i + 1) + ". " + categories.get(i));
+        }
+        System.out.print("Enter a number, or type a new category name: ");
     }
 }
 
