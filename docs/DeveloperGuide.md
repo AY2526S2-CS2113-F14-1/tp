@@ -8,6 +8,54 @@
 
 {Describe the design and implementation of the product. Use UML diagrams and short code snippets where applicable.}
 
+### Delete Feature
+
+The delete feature allows users to remove an existing expense from their tracking list by providing its 1-based index (e.g., `delete 1`).
+
+**How it works:**
+
+The user types `delete` followed by a single positive integer representing the expense's index.
+
+**Implementation:**
+
+`Parser.parseDeleteCommand()` splits the input string. It first verifies there is exactly one argument and then attempts to parse it into an integer. If the argument is missing, non-numeric, or zero/negative, it catches the parsing issues (or returns `null`) and tells `Ui` to show an invalid index message.
+
+A valid integer index results in the instantiation of a `DeleteCommand`.
+
+Below is the sequence of interactions when the user enters a valid command like `delete 1`:
+
+```
+@startuml
+actor User
+participant "Parser" as P
+participant "DeleteCommand" as DC
+participant "ExpenseList" as EL
+participant "Ui" as UI
+
+User -> P : parse("delete 1", ui)
+P -> P : Integer.parseInt("1")
+P -> DC : new DeleteCommand(ui, 1)
+DC --> P : deleteCommand
+P --> User : deleteCommand
+
+User -> DC : execute(expenseList)
+DC -> EL : deleteExpense(0)
+EL -> EL : expenses.remove(0)
+EL --> DC : removedExpense
+DC -> UI : showDeleteExpense(removedExpense, size)
+UI --> DC : (confirmation printed)
+DC --> User : (done)
+@enduml
+```
+
+`DeleteCommand.execute()` operates by:
+1. Validating that the given index is greater than `0`.
+2. Attempting to call `ExpenseList.deleteExpense(index - 1)`. 
+3. Catching an `IndexOutOfBoundsException` if the index given is larger than the actual list's bounds, showing an error via the `Ui`.
+4. Successfully removing the item and showing a success message via `Ui.showDeleteExpense()`.
+
+Because deletion permanently removes persisted data, `DeleteCommand.shouldPersist()` returns `true`, triggering a file save sequentially.
+
 ### Edit Expense Feature
 
 The edit feature allows users to modify one or more fields of an existing expense using the `edit` command.
@@ -145,7 +193,7 @@ P --> User : sortCommand
 
 User -> SC : execute(expenseList)
 SC -> EL : sortExpenses(BY_CATEGORY)
-EL -> EL : expenses.sort(comparator)
+EL -> EL : java.util.Collections.sort(expenses, comparator)
 EL --> SC : (sorted in place)
 SC -> UI : showSorted(expenseList, "category")
 UI --> SC : (list printed)
@@ -153,10 +201,10 @@ SC --> User : (done)
 @enduml
 ```
 
-`SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `ArrayList.sort()` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
+`SortCommand` delegates the actual reordering to `ExpenseList.sortExpenses(Comparator)`, which calls `java.util.Collections.sort(expenses, comparator)` in place. Two static `Comparator<Expense>` constants are pre-defined in `SortCommand`:
 
-- `BY_CATEGORY` — uses `String.CASE_INSENSITIVE_ORDER` on `Expense.getCategory()`.
-- `BY_DATE` — uses the natural order of `LocalDate` via `Expense.getDate()`.
+- `BY_CATEGORY` — uses `String.CASE_INSENSITIVE_ORDER` on `Expense.getCategory()`, with a fallback to sort by date (newest first) using `.thenComparing(Expense::getDate, Comparator.reverseOrder())`.
+- `BY_DATE` — uses the reverse natural order of `LocalDate` via `Expense.getDate()` so the newest expenses appear first.
 
 Because the sort modifies the list order that is persisted to file, `SortCommand.shouldPersist()` returns `true`, triggering a save after execution.
 
