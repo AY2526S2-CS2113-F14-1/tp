@@ -16,14 +16,15 @@ This section summarizes my specific contributions to the project, focusing on co
     * *Justification:* Quickly summarizing overall spending categories is the core value proposition of a budget tracker.
     * *Highlights:* Utilized a `LinkedHashMap` to maintain deterministic, intuitive insertion-order iteration, ensuring the users see a consistent report every time without relying on heavier map sorting algorithms.
   * **Chronological Insertion & Deletion**: Refactored the fundamental way `ExpenseList` handles data. Expenses are now injected directly in purely chronological (newest-first) order. Also authored the strict `DeleteCommand` ensuring comprehensive bound-checking and error-handling against corrupted manual saves.
+  * **Automated Unit Testing Environment**: Independently designed and authored extensive JUnit testing suites ensuring edge-case scenarios—such as chronological anomalies or out-of-bounds index deletion inputs—fail gracefully without an application crash.
 
 * **Contributions to the UG**:
-  * Authored the comprehensive usage sections for `sort` and `list` commands.
+  * Authored the comprehensive usage and parameter explanation sections for the `sort`, `list`, `stats`, and `delete` commands, ensuring non-technical users completely understand their application logic.
   * Updated the overarching Command Summary, adding warnings regarding expected date descending behaviors.
 
 * **Contributions to the DG**:
   * Authored the "Design & Implementation" and "Design Considerations" for three full chapters: **Sort Feature**, **Statistics Feature**, and **Delete Feature**.
-  * Drafted and embedded highly detailed UML Sequence Diagrams mapping the exact memory execution paths of the Parser, Commands, and UI interactions. 
+  * Drafted and embedded **3 highly detailed UML Sequence Diagrams** mapping the exact memory execution paths of the Parser, Commands, and UI interactions to visualize application flow.
   * Wrote manual functional testing parameters for my three core commands.
 
 * **Contributions to Team-based Tasks**:
