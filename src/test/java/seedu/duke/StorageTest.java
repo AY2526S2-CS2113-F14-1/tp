@@ -1,6 +1,7 @@
 package seedu.duke;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -144,5 +145,105 @@ public class StorageTest {
         storage.load(loadedList);
         assertEquals(0, loadedList.getSize(),
                 "Loading from a missing file should leave the list empty without throwing");
+    }
+
+    // ── Loan persistence ─────────────────────────────────────────────────────
+
+    @Test
+    public void saveAndLoad_validLoans_roundTripMaintainsData() {
+        Path dataFilePath = tempDir.resolve("loans.txt");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList originalList = new ExpenseList();
+        originalList.addLoan(new Loan("John", 20.00, LocalDate.parse("2026-04-01")));
+        originalList.addLoan(new Loan("Alice", 50.00, LocalDate.parse("2026-04-02")));
+        storage.save(originalList);
+
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(2, loadedList.getLoanCount());
+        assertEquals("John", loadedList.getLoan(0).getBorrowerName());
+        assertEquals(20.00, loadedList.getLoan(0).getAmount(), 0.0001);
+        assertEquals(LocalDate.parse("2026-04-01"), loadedList.getLoan(0).getDate());
+        assertFalse(loadedList.getLoan(0).isRepaid());
+    }
+
+    @Test
+    public void saveAndLoad_repaidLoan_repaidStatusPersists() {
+        Path dataFilePath = tempDir.resolve("repaid-loan.txt");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList originalList = new ExpenseList();
+        Loan loan = new Loan("John", 20.00, LocalDate.parse("2026-04-01"));
+        loan.markRepaid();
+        originalList.addLoan(loan);
+        storage.save(originalList);
+
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(1, loadedList.getLoanCount());
+        assertTrue(loadedList.getLoan(0).isRepaid());
+    }
+
+    @Test
+    public void saveAndLoad_loansDoNotAppearInExpenseList() {
+        Path dataFilePath = tempDir.resolve("loans-only.txt");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList originalList = new ExpenseList();
+        originalList.addLoan(new Loan("John", 20.00, LocalDate.parse("2026-04-01")));
+        storage.save(originalList);
+
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getSize());
+        assertEquals(1, loadedList.getLoanCount());
+    }
+
+    @Test
+    public void load_loanLineWrongFieldCount_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("malformed-loan.txt");
+        Files.writeString(dataFilePath, "LOAN | only two fields\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
+    }
+
+    @Test
+    public void load_loanLineWithEmptyBorrower_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("empty-borrower.txt");
+        Files.writeString(dataFilePath, "LOAN | 20.00 | 2026-04-01 |  | false\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
+    }
+
+    @Test
+    public void load_loanLineWithZeroAmount_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("zero-loan.txt");
+        Files.writeString(dataFilePath, "LOAN | 0.0 | 2026-04-01 | John | false\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
+    }
+
+    @Test
+    public void load_loanLineWithInvalidAmount_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("invalid-loan-amount.txt");
+        Files.writeString(dataFilePath, "LOAN | notanumber | 2026-04-01 | John | false\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
+    }
+
+    @Test
+    public void load_loanLineWithInvalidDate_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("invalid-loan-date.txt");
+        Files.writeString(dataFilePath, "LOAN | 20.00 | notadate | John | false\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
     }
 }

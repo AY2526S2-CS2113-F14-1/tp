@@ -95,4 +95,124 @@ public class ParserTest {
         Command command = Parser.parse("find", ui);
         assertNull(command, "Parser should return null when find has no keyword");
     }
+
+    // ── lend command ─────────────────────────────────────────────────────────
+
+    @Test
+    public void parse_lendCommandValid_returnsLendCommand() {
+        Command command = Parser.parse("lend 20.00 John", ui);
+        assertTrue(command instanceof LendCommand);
+    }
+
+    @Test
+    public void parse_lendCommandWithDate_returnsLendCommand() {
+        Command command = Parser.parse("lend 20.00 John /da 2026-04-01", ui);
+        assertTrue(command instanceof LendCommand);
+    }
+
+    @Test
+    public void parse_lendCommandNoArguments_returnsNull() {
+        Command command = Parser.parse("lend", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandAmountOnly_returnsNull() {
+        Command command = Parser.parse("lend 20.00", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandInvalidAmount_returnsNull() {
+        Command command = Parser.parse("lend abc John", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandZeroAmount_returnsNull() {
+        Command command = Parser.parse("lend 0 John", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandNegativeAmount_returnsNull() {
+        Command command = Parser.parse("lend -5.00 John", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandInvalidDate_returnsNull() {
+        Command command = Parser.parse("lend 20.00 John /da notadate", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_lendCommandBorrowerStartsWithSlash_returnsNull() {
+        Command command = Parser.parse("lend 20.00 /unknownflag", ui);
+        assertNull(command);
+    }
+
+    // ── loans command ─────────────────────────────────────────────────────────
+
+    @Test
+    public void parse_loansCommand_returnsLoansCommand() {
+        Command command = Parser.parse("loans", ui);
+        assertTrue(command instanceof LoansCommand);
+    }
+
+    @Test
+    public void parse_loansCommandAll_returnsLoansCommand() {
+        Command command = Parser.parse("loans /all", ui);
+        assertTrue(command instanceof LoansCommand);
+    }
+
+    @Test
+    public void parse_loansCommandInvalidArg_returnsNull() {
+        Command command = Parser.parse("loans xyz", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_loansCommandSimilarName_returnsNull() {
+        Command command = Parser.parse("loansifajo", ui);
+        assertNull(command);
+    }
+
+    // ── repay command ─────────────────────────────────────────────────────────
+
+    @Test
+    public void parse_repayCommandValid_returnsRepayCommand() {
+        Command command = Parser.parse("repay 1", ui);
+        assertTrue(command instanceof RepayCommand);
+    }
+
+    @Test
+    public void parse_repayCommandNoArguments_returnsNull() {
+        Command command = Parser.parse("repay", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_repayCommandInvalidIndex_returnsNull() {
+        Command command = Parser.parse("repay abc", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_repayCommandZeroIndex_returnsNull() {
+        Command command = Parser.parse("repay 0", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_repayCommandNegativeIndex_returnsNull() {
+        Command command = Parser.parse("repay -1", ui);
+        assertNull(command);
+    }
+
+    @Test
+    public void parse_repayCommandExtraTokens_returnsNull() {
+        Command command = Parser.parse("repay 1 extra", ui);
+        assertNull(command);
+    }
 }

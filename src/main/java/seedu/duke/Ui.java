@@ -1,4 +1,5 @@
 package seedu.duke;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -77,6 +78,12 @@ public class Ui {
         System.out.println("  edit INDEX [/a AMOUNT] [/de DESC]         - Edit an existing expense");
         System.out.println("             [/c CATEGORY] [/da DATE]");
         System.out.println("  find KEYWORD                              - Find expenses by keyword");
+        System.out.println("  sort category|date                        - Sort expenses");
+        System.out.println("  stats                                     - Spending breakdown by category");
+        System.out.println("  lend AMOUNT BORROWER [/da DATE]           - Record money lent to someone");
+        System.out.println("  loans                                     - Show outstanding loans");
+        System.out.println("  loans /all                                - Show all loans (incl. repaid)");
+        System.out.println("  repay INDEX                               - Mark a loan as repaid");
         System.out.println("  help                                      - Show this help menu");
         System.out.println("  exit                                      - Exit the application");
         System.out.println("Note: DATE must be in YYYY-MM-DD format (e.g. 2026-03-24).");
@@ -405,10 +412,18 @@ public class Ui {
 
 
 
+    /**
+     * Reads and returns the next line of user input, trimmed of leading and trailing whitespace.
+     */
     public String getUserInput() {
         return in.nextLine().trim();
     }
 
+    /**
+     * Displays a numbered list of available categories and prompts the user to choose one or type a new one.
+     *
+     * @param categories The current list of available categories.
+     */
     public void showCategoryPrompt(java.util.ArrayList<String> categories) {
         System.out.println(LINE);
         System.out.println("You didn't specify a category! Choose one from the list:");
@@ -417,5 +432,122 @@ public class Ui {
         }
         System.out.print("Enter a number, or type a new category name: ");
     }
-}
 
+    /**
+     * Displays confirmation after a loan is recorded.
+     *
+     * @param loan      The loan that was recorded.
+     * @param loanCount The total number of loans recorded so far.
+     */
+    public void showLendAdded(Loan loan, int loanCount) {
+        System.out.println(LINE);
+        System.out.println("Got it. I've recorded this loan:");
+        System.out.println("  " + loan);
+        System.out.println("You now have " + loanCount + " loan(s) on record.");
+        System.out.println("This does not affect your expense total or budget.");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays the loan list, showing either only outstanding loans or all loans depending on showAll.
+     *
+     * @param expenseList The ExpenseList whose loans will be displayed.
+     * @param showAll     If true, repaid loans are included in the output.
+     */
+    public void showLoans(ExpenseList expenseList, boolean showAll) {
+        System.out.println(LINE);
+
+        ArrayList<Loan> toShow = showAll
+                ? expenseList.getAllLoans()
+                : expenseList.getOutstandingLoans();
+
+        if (toShow.isEmpty()) {
+            if (showAll) {
+                System.out.println("No loans on record.");
+            } else {
+                System.out.println("No outstanding loans.");
+                if (expenseList.getLoanCount() > 0) {
+                    System.out.println("(All loans have been repaid. Use 'loans /all' to see them.)");
+                }
+            }
+            System.out.println(LINE);
+            return;
+        }
+
+        if (showAll) {
+            System.out.println("All loans (" + toShow.size() + "):");
+        } else {
+            System.out.println("Outstanding loans (" + toShow.size() + "):");
+        }
+
+        for (int i = 0; i < toShow.size(); i++) {
+            System.out.println("  " + (i + 1) + ". " + toShow.get(i));
+        }
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays confirmation after a loan is marked as repaid.
+     *
+     * @param loan The loan that was marked repaid.
+     */
+    public void showRepaid(Loan loan) {
+        System.out.println(LINE);
+        System.out.println("Great! Marked as repaid:");
+        System.out.println("  " + loan);
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays an error when there are no outstanding loans to repay.
+     */
+    public void showNoOutstandingLoans() {
+        System.out.println(LINE);
+        System.out.println("There are no outstanding loans to repay.");
+        System.out.println("Use 'loans /all' to see all past loans.");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays an error when the repay index is out of range.
+     *
+     * @param maxIndex The number of currently outstanding loans.
+     */
+    public void showInvalidLoanIndex(int maxIndex) {
+        System.out.println(LINE);
+        System.out.println("Invalid loan index! There are " + maxIndex + " outstanding loan(s).");
+        System.out.println("Use 'loans' to see the current list.");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays usage instructions for the lend command.
+     */
+    public void showLendUsage() {
+        System.out.println(LINE);
+        System.out.println("Usage: lend <amount> <borrower name> [/da <YYYY-MM-DD>]");
+        System.out.println("Example: lend 20.00 John");
+        System.out.println("Example: lend 50.00 Jane /da 2026-04-01");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays usage instructions for the loans command.
+     */
+    public void showLoansUsage() {
+        System.out.println(LINE);
+        System.out.println("Usage: loans          (show outstanding loans)");
+        System.out.println("       loans /all     (show all loans including repaid)");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays usage instructions for the repay command.
+     */
+    public void showRepayUsage() {
+        System.out.println(LINE);
+        System.out.println("Usage: repay <index>");
+        System.out.println("Use 'loans' to see the index of each outstanding loan.");
+        System.out.println(LINE);
+    }
+}

@@ -7,22 +7,28 @@ import java.util.Comparator;
 /**
  * Represents the list of expenses tracked by the user.
  * Handles adding, deleting, retrieving, and replacing expenses.
+ * Maintains a separate list of loans that does not affect expense totals or budget.
  */
 public class ExpenseList {
     private java.util.ArrayList<String> categories;
     private final ArrayList<Expense> expenses;
+    private final ArrayList<Loan> loans;
     private double budget;
+
     public ExpenseList() {
         this.expenses = new ArrayList<>();
+        this.loans = new ArrayList<>();
         this.budget = -1;
         this.categories = new ArrayList<>(Arrays.asList(
                 "Food", "Transport", "Shopping", "Entertainment", "Health", "Others"
         ));
         assert this.expenses != null : "Expenses list should be initialised in constructor";
+        assert this.loans != null : "Loans list should be initialised in constructor";
     }
 
     /**
      * Returns the master list of available categories.
+     *
      * @return ArrayList of category strings.
      */
     public ArrayList<String> getCategoryList() {
@@ -31,6 +37,7 @@ public class ExpenseList {
 
     /**
      * Retrieves a specific category from the master list by index.
+     *
      * @param index The index of the category.
      * @return The category string.
      */
@@ -40,6 +47,7 @@ public class ExpenseList {
 
     /**
      * Formats and adds a new custom category to the list just above "Others".
+     *
      * @param newCategory The raw string typed by the user.
      */
     public void addCategory(String newCategory) {
@@ -56,6 +64,7 @@ public class ExpenseList {
             categories.add(categories.size() - 1, formatted);
         }
     }
+
     /**
      * Adds a new expense to the list in chronological order (newest date first).
      * Iterates through the existing expenses and inserts the new expense at the
@@ -83,6 +92,7 @@ public class ExpenseList {
         addCategory(expense.getCategory());
         assert expenses.contains(expense) : "Expense should be present in list after add";
     }
+
     /**
      * Returns the current number of expenses in the list.
      *
@@ -91,6 +101,7 @@ public class ExpenseList {
     public int getSize() {
         return expenses.size();
     }
+
     /**
      * Returns the expense at the specified 0-based index.
      *
@@ -100,6 +111,7 @@ public class ExpenseList {
     public Expense getExpense(int index) {
         return expenses.get(index);
     }
+
     /**
      * Replaces the expense at the given 0-based index with a new one.
      *
@@ -134,6 +146,7 @@ public class ExpenseList {
     public double getBudget() {
         return budget;
     }
+
     /**
      * Returns whether a budget has been set.
      *
@@ -151,6 +164,7 @@ public class ExpenseList {
     public double getRemainingBudget() {
         return budget - getTotalAmount();
     }
+
     /**
      * Calculates the total amount of all expenses.
      *
@@ -163,6 +177,7 @@ public class ExpenseList {
         }
         return total;
     }
+
     /**
      * Checks whether the total spending exceeds the budget.
      *
@@ -171,6 +186,7 @@ public class ExpenseList {
     public boolean isOverBudget() {
         return hasBudget() && getTotalAmount() > budget;
     }
+
     /**
      * Removes and returns the expense at the given 0-based index.
      *
@@ -191,5 +207,65 @@ public class ExpenseList {
         assert comparator != null : "Comparator must not be null";
         java.util.Collections.sort(expenses, comparator);
     }
-}
 
+    /**
+     * Adds a loan to the loan sub-list.
+     * Loans are appended in the order they are recorded.
+     * They do not appear in the expense list and do not affect totals or budget.
+     *
+     * @param loan The loan to add. Must not be null.
+     * @throws IllegalArgumentException If loan is null.
+     */
+    public void addLoan(Loan loan) {
+        if (loan == null) {
+            throw new IllegalArgumentException("Loan must not be null");
+        }
+        loans.add(loan);
+        assert loans.contains(loan) : "Loan should be present after add";
+    }
+
+    /**
+     * Returns the total number of loans (outstanding + repaid).
+     *
+     * @return The size of the full loan list.
+     */
+    public int getLoanCount() {
+        return loans.size();
+    }
+
+    /**
+     * Returns the loan at the given 0-based index in the full loan list.
+     *
+     * @param index 0-based index.
+     * @return The Loan at that position.
+     */
+    public Loan getLoan(int index) {
+        return loans.get(index);
+    }
+
+    /**
+     * Returns all loans, including repaid ones.
+     *
+     * @return A new list containing every recorded loan.
+     */
+    public ArrayList<Loan> getAllLoans() {
+        return new ArrayList<>(loans);
+    }
+
+    /**
+     * Returns only the loans that have not yet been repaid.
+     * The order mirrors their position in the full list,
+     * so the 1-based index used by RepayCommand is stable.
+     *
+     * @return A new list of outstanding loans.
+     */
+    public ArrayList<Loan> getOutstandingLoans() {
+        ArrayList<Loan> outstanding = new ArrayList<>();
+        for (Loan loan : loans) {
+            if (!loan.isRepaid()) {
+                outstanding.add(loan);
+            }
+        }
+        return outstanding;
+    }
+}

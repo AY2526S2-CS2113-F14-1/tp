@@ -2,6 +2,7 @@ package seedu.duke;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TotalCommandTest {
 
@@ -41,5 +42,11 @@ public class TotalCommandTest {
 
         assertDoesNotThrow(() -> totalCommand.execute(expenseList),
                 "TotalCommand should execute successfully on a populated list");
+    }
+
+    @Test
+    public void shouldPersist_returnsFalse() {
+        TotalCommand totalCommand = new TotalCommand(new Ui());
+        assertFalse(totalCommand.shouldPersist());
     }
 }

@@ -13,16 +13,23 @@ import java.util.logging.Logger;
  * Handles reading and writing expense data to a text file
  * so that data persists between sessions.
  * Each line in the file stores one expense in the format: AMOUNT | DATE | CATEGORY | DESCRIPTION.
+ * Loan lines use the format: LOAN | AMOUNT | DATE | BORROWER | REPAID.
  */
 public class Storage {
     private static final String SEPARATOR = " | ";
     private static final String SPLIT_REGEX = "\\s*\\|\\s*";
-    /** Number of fields expected on each saved line. */
+    /** Number of fields expected on each saved expense line. */
     private static final int FIELD_COUNT = 4;
     private static final int IDX_AMOUNT      = 0;
     private static final int IDX_DATE        = 1;
     private static final int IDX_CATEGORY    = 2;
     private static final int IDX_DESCRIPTION = 3;
+    /** Number of fields expected on each saved loan line, excluding the LOAN prefix. */
+    private static final int LOAN_FIELD_COUNT  = 4;
+    private static final int LOAN_IDX_AMOUNT   = 0;
+    private static final int LOAN_IDX_DATE     = 1;
+    private static final int LOAN_IDX_BORROWER = 2;
+    private static final int LOAN_IDX_REPAID   = 3;
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
@@ -47,7 +54,7 @@ public class Storage {
         assert this.ui != null : "Storage UI should be initialised";
     }
     /**
-     * Loads expenses from the data file into the given ExpenseList.
+     * Loads expenses and loans from the data file into the given ExpenseList.
      * Malformed lines are skipped with a warning; a missing file is silently ignored.
      *
      * @param expenseList The ExpenseList to populate with saved data.
@@ -78,6 +85,13 @@ public class Storage {
                     }
                     continue;
                 }
+                if (line.startsWith("LOAN" + SEPARATOR)) {
+                    Loan loan = parseLoanLine(line);
+                    if (loan != null) {
+                        expenseList.addLoan(loan);
+                    }
+                    continue;
+                }
                 Expense expense = parseLine(line);
                 if (expense != null) {
                     expenseList.addExpense(expense);
@@ -89,7 +103,7 @@ public class Storage {
         }
     }
     /**
-     * Saves all expenses and budget data from the given ExpenseList to the file.
+     * Saves all expenses, loans, and budget data from the given ExpenseList to the file.
      * Creates the parent directory if it does not exist.
      * Saves using the v2.0 format: AMOUNT | DATE | CATEGORY | DESCRIPTION,
      * with an optional budget line.
@@ -122,6 +136,18 @@ public class Storage {
                                 + SEPARATOR + expense.getDate()
                                 + SEPARATOR + expense.getCategory()
                                 + SEPARATOR + expense.getDescription()
+                                + System.lineSeparator()
+                );
+            }
+            for (int i = 0; i < expenseList.getLoanCount(); i++) {
+                Loan loan = expenseList.getLoan(i);
+                assert loan != null : "Stored loans should never contain null values";
+                writer.write(
+                        "LOAN"
+                                + SEPARATOR + loan.getAmount()
+                                + SEPARATOR + loan.getDate()
+                                + SEPARATOR + loan.getBorrowerName()
+                                + SEPARATOR + loan.isRepaid()
                                 + System.lineSeparator()
                 );
             }
@@ -173,6 +199,47 @@ public class Storage {
         } catch (IllegalArgumentException | DateTimeParseException e) {
             ui.showInvalidAmountLineWarning(line);
             logger.log(Level.WARNING, "Storage line rejected by Expense constructor: " + line, e);
+            return null;
+        }
+    }
+    /**
+     * Parses a loan line from the data file and returns a Loan object.
+     * Returns null and displays a warning if the line is malformed or contains invalid values.
+     *
+     * @param line The full line including the LOAN prefix.
+     * @return The parsed Loan, or null if the line is malformed.
+     */
+    private Loan parseLoanLine(String line) {
+        String payload = line.substring(("LOAN" + SEPARATOR).length()).trim();
+        String[] parts = payload.split(SPLIT_REGEX, LOAN_FIELD_COUNT);
+        if (parts.length != LOAN_FIELD_COUNT) {
+            ui.showMalformedLineWarning(line);
+            logger.warning("Malformed loan line (wrong field count): " + line);
+            return null;
+        }
+        try {
+            double amount = Double.parseDouble(parts[LOAN_IDX_AMOUNT].trim());
+            LocalDate date = LocalDate.parse(parts[LOAN_IDX_DATE].trim(), DATE_FORMAT);
+            String borrower = parts[LOAN_IDX_BORROWER].trim();
+            boolean isRepaid = Boolean.parseBoolean(parts[LOAN_IDX_REPAID].trim());
+            if (borrower.isEmpty()) {
+                ui.showMalformedLineWarning(line);
+                logger.warning("Loan line with empty borrower skipped: " + line);
+                return null;
+            }
+            if (amount <= 0) {
+                ui.showInvalidAmountLineWarning(line);
+                logger.warning("Loan line with non-positive amount skipped: " + line);
+                return null;
+            }
+            Loan loan = new Loan(borrower, amount, date);
+            if (isRepaid) {
+                loan.markRepaid();
+            }
+            return loan;
+        } catch (DateTimeParseException | IllegalArgumentException e) {
+            ui.showInvalidAmountLineWarning(line);
+            logger.log(Level.WARNING, "Loan line rejected: " + line, e);
             return null;
         }
     }
