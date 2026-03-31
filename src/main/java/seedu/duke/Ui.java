@@ -71,7 +71,8 @@ public class Ui {
         System.out.println("  add AMOUNT [/c CATEGORY] [/da DATE] DESC  - Add a new expense");
         System.out.println("  list                                      - List all expenses");
         System.out.println("  total                                     - Show total amount spent");
-        System.out.println("  budget AMOUNT                             - Set a spending budget");
+        System.out.println("  budget [AMOUNT]                           - Set or view spending budget");
+        System.out.println("                                              (no amount = view current budget)");
         System.out.println("  delete INDEX                              - Delete an expense by index");
         System.out.println("  edit INDEX [/a AMOUNT] [/de DESC]         - Edit an existing expense");
         System.out.println("             [/c CATEGORY] [/da DATE]");
@@ -278,6 +279,37 @@ public class Ui {
     }
 
     /**
+     * Displays a message indicating that the budget has not been set.
+     */
+    public void showBudgetNotSet() {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Budget not set yet! Use: budget <amount>");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    }
+
+    /**
+     * Displays the current budget details, including total spent and remaining budget.
+     * If the budget is exceeded, the exceeded amount is shown instead.
+     *
+     * @param budget The currently set budget.
+     * @param totalSpent The total amount spent.
+     * @param remaining The remaining budget. Can be negative if exceeded.
+     */
+    public void showBudgetDetails(double budget, double totalSpent, double remaining) {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Current budget: $" + budget);
+        System.out.println("Total spent: $" + totalSpent);
+
+        if (remaining >= 0) {
+            System.out.println("Remaining budget: $" + remaining);
+        } else {
+            System.out.println("Budget exceeded by $" + (-remaining));
+        }
+
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    }
+
+    /**
      * Displays the correct usage format for the budget command.
      */
     public void showBudgetUsage() {
@@ -291,7 +323,7 @@ public class Ui {
      */
     public void showInvalidBudget() {
         System.out.println(LINE);
-        System.out.println("Budget must be a valid non-negative number.");
+        System.out.println("Budget must be a number greater then 0.");
         System.out.println(LINE);
     }
 

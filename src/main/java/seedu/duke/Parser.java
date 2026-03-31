@@ -89,12 +89,11 @@ public class Parser {
 
         case "budget":
             if (arguments.isEmpty()) {
-                ui.showBudgetUsage();
-                return null;
+                return new BudgetCommand(ui, null);
             }
             try {
                 double budgetAmount = Double.parseDouble(arguments);
-                if (budgetAmount < 0) {
+                if (budgetAmount <= 0) {
                     ui.showInvalidBudget();
                     return null;
                 }

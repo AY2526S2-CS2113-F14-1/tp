@@ -112,18 +112,20 @@ public class ExpenseList {
         }
         expenses.set(index, expense);
     }
+
     /**
      * Sets the spending budget.
      *
-     * @param budget The budget amount to set. Must be non-negative.
-     * @throws IllegalArgumentException If the budget is negative.
+     * @param budget The budget amount to set. Must be greater than 0.
+     * @throws IllegalArgumentException If the budget is not greater than 0.
      */
     public void setBudget(double budget) {
-        if (budget < 0) {
-            throw new IllegalArgumentException("Budget cannot be negative");
+        if (budget <= 0) {
+            throw new IllegalArgumentException("Budget must be greater than 0");
         }
         this.budget = budget;
     }
+
     /**
      * Returns the currently set budget.
      *
@@ -139,6 +141,15 @@ public class ExpenseList {
      */
     public boolean hasBudget() {
         return budget >= 0;
+    }
+
+    /**
+     * Returns the remaining budget after subtracting total expenses.
+     *
+     * @return Remaining budget. Can be negative if the budget is exceeded.
+     */
+    public double getRemainingBudget() {
+        return budget - getTotalAmount();
     }
     /**
      * Calculates the total amount of all expenses.
