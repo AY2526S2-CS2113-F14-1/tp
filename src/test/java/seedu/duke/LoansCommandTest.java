@@ -12,19 +12,17 @@ public class LoansCommandTest {
     private final Ui ui = new Ui();
 
     @Test
-    public void execute_emptyList_showAllFalse_executesWithoutException() {
-        ExpenseList expenseList = new ExpenseList();
-        assertDoesNotThrow(() -> new LoansCommand(ui, false).execute(expenseList));
+    public void execute_emptyListShowAllFalse_doesNotThrow() {
+        assertDoesNotThrow(() -> new LoansCommand(ui, false).execute(new ExpenseList()));
     }
 
     @Test
-    public void execute_emptyList_showAllTrue_executesWithoutException() {
-        ExpenseList expenseList = new ExpenseList();
-        assertDoesNotThrow(() -> new LoansCommand(ui, true).execute(expenseList));
+    public void execute_emptyListShowAllTrue_doesNotThrow() {
+        assertDoesNotThrow(() -> new LoansCommand(ui, true).execute(new ExpenseList()));
     }
 
     @Test
-    public void execute_emptyList_showAllTrue_printsNoLoansOnRecord() {
+    public void execute_emptyListShowAllTrue_printsNoLoansOnRecord() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
@@ -36,7 +34,7 @@ public class LoansCommandTest {
     }
 
     @Test
-    public void execute_emptyList_showAllFalse_printsNoOutstandingLoans() {
+    public void execute_emptyListShowAllFalse_printsNoOutstandingLoans() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
@@ -48,7 +46,7 @@ public class LoansCommandTest {
     }
 
     @Test
-    public void execute_allLoansRepaid_showAllFalse_printsAllRepaidMessage() {
+    public void execute_allRepaidShowAllFalse_printsRepaidMessage() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
@@ -64,7 +62,7 @@ public class LoansCommandTest {
     }
 
     @Test
-    public void execute_outstandingLoans_showAllFalse_displaysBorrowerName() {
+    public void execute_outstandingLoans_displaysBorrowerName() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
@@ -78,7 +76,7 @@ public class LoansCommandTest {
     }
 
     @Test
-    public void execute_mixedLoans_showAllTrue_displaysAllBorrowers() {
+    public void execute_mixedLoansShowAllTrue_displaysAllBorrowers() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
@@ -97,7 +95,7 @@ public class LoansCommandTest {
     }
 
     @Test
-    public void execute_mixedLoans_showAllFalse_displaysOnlyOutstanding() {
+    public void execute_mixedLoansShowAllFalse_displaysOnlyOutstanding() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream original = System.out;
         System.setOut(new PrintStream(out));
