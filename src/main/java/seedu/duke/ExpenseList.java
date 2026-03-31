@@ -22,7 +22,7 @@ public class ExpenseList {
 
     /**
      * Returns the master list of available categories.
-     * * @return ArrayList of category strings.
+     * @return ArrayList of category strings.
      */
     public ArrayList<String> getCategoryList() {
         return categories;
@@ -30,7 +30,7 @@ public class ExpenseList {
 
     /**
      * Retrieves a specific category from the master list by index.
-     * * @param index The index of the category.
+     * @param index The index of the category.
      * @return The category string.
      */
     public String getCategory(int index) {
@@ -39,7 +39,7 @@ public class ExpenseList {
 
     /**
      * Formats and adds a new custom category to the list just above "Others".
-     * * @param newCategory The raw string typed by the user.
+     * @param newCategory The raw string typed by the user.
      */
     public void addCategory(String newCategory) {
         if (newCategory == null || newCategory.trim().isEmpty()) {

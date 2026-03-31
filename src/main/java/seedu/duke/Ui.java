@@ -7,6 +7,7 @@ import java.util.Map;
  */
 public class Ui {
     private static final String LINE = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    private final java.util.Scanner in = new java.util.Scanner(System.in);
 
     /**
      * Displays the welcome message when the application starts.
@@ -370,8 +371,7 @@ public class Ui {
         System.out.println(LINE);
     }
 
-    // Creates a Scanner to read the user's interactive response
-    private final java.util.Scanner in = new java.util.Scanner(System.in);
+
 
     public String getUserInput() {
         return in.nextLine().trim();
