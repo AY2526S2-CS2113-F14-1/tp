@@ -246,4 +246,98 @@ public class StorageTest {
         storage.load(loadedList);
         assertEquals(0, loadedList.getLoanCount());
     }
+
+    @Test
+    public void constructor_emptyPath_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> new Storage("  ", new Ui()));
+    }
+
+    @Test
+    public void load_emptyLines_skippedGracefully() throws IOException {
+        Path dataFilePath = tempDir.resolve("empty-lines.txt");
+        Files.writeString(dataFilePath, "\n\n5.50 | 2026-03-24 | Food | Coffee\n\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(1, loadedList.getSize());
+    }
+
+    @Test
+    public void load_budgetMalformedValue_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("bad-budget.txt");
+        Files.writeString(dataFilePath, "BUDGET | notanumber\n5.00 | 2026-03-24 | Food | Lunch\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(1, loadedList.getSize());
+        assertFalse(loadedList.hasBudget(), "Malformed budget should not be set");
+    }
+
+    @Test
+    public void load_v1FormatEmptyDescription_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("v1-empty-desc.txt");
+        Files.writeString(dataFilePath, "5.50 | \n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getSize(), "v1 line with empty description should be skipped");
+    }
+
+    @Test
+    public void load_v2FormatEmptyDescription_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("v2-empty-desc.txt");
+        Files.writeString(dataFilePath, "5.50 | 2026-03-24 | Food | \n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getSize(), "v2 line with empty description should be skipped");
+    }
+
+    @Test
+    public void load_v2FormatInvalidDate_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("v2-bad-date.txt");
+        Files.writeString(dataFilePath, "5.50 | notadate | Food | Coffee\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getSize(), "v2 line with invalid date should be skipped");
+    }
+
+    @Test
+    public void load_threeFieldLine_skipsAsMalformed() throws IOException {
+        Path dataFilePath = tempDir.resolve("three-fields.txt");
+        Files.writeString(dataFilePath, "5.50 | 2026-03-24 | Food\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getSize(), "3-field line should be skipped as malformed");
+    }
+
+    @Test
+    public void saveAndLoad_loansSavedAlongsideExpenses_bothReloaded() {
+        Path dataFilePath = tempDir.resolve("mixed.txt");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList originalList = new ExpenseList();
+        originalList.addExpense(new Expense("Coffee", 5.50, "Food", LocalDate.parse("2026-03-24")));
+        originalList.addLoan(new Loan("Alice", 30.00, LocalDate.parse("2026-04-01")));
+        originalList.setBudget(200.00);
+        storage.save(originalList);
+
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(1, loadedList.getSize(), "Expense should be reloaded");
+        assertEquals(1, loadedList.getLoanCount(), "Loan should be reloaded");
+        assertTrue(loadedList.hasBudget(), "Budget should be reloaded");
+        assertEquals(200.00, loadedList.getBudget(), 0.0001);
+    }
+
+    @Test
+    public void load_loanLineNegativeAmount_skipsLine() throws IOException {
+        Path dataFilePath = tempDir.resolve("negative-loan.txt");
+        Files.writeString(dataFilePath, "LOAN | -10.00 | 2026-04-01 | John | false\n");
+        Storage storage = new Storage(dataFilePath.toString(), new Ui());
+        ExpenseList loadedList = new ExpenseList();
+        storage.load(loadedList);
+        assertEquals(0, loadedList.getLoanCount());
+    }
 }

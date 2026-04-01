@@ -102,6 +102,27 @@ class SpendSwiftTest {
                 "Category should appear in list output");
     }
 
+    @Test
+    public void run_helpCommand_showsHelpMenu() {
+        String output = runWithInput("help\nexit\n", tempDir);
+        assertTrue(output.contains("Here are the available commands:"),
+                "Help command should display help menu");
+    }
+
+    @Test
+    public void run_totalCommand_showsTotalSpending() {
+        String output = runWithInput("total\nexit\n", tempDir);
+        assertTrue(output.contains("Your total spending is:"),
+                "Total command should display total spending");
+    }
+
+    @Test
+    public void run_budgetThenAdd_showsBudgetWarning() {
+        String output = runWithInput("budget 5\nadd 10.00 Lunch /c Food\nexit\n", tempDir);
+        assertTrue(output.contains("exceeded"),
+                "Adding expense over budget should trigger warning");
+    }
+
     private String runWithInput(String input, Path workingDirectory) {
         InputStream originalIn = System.in;
         PrintStream originalOut = System.out;

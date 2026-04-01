@@ -483,4 +483,69 @@ public class ParserTest {
                 "find lunch /c Food /dmin 2026-01-01 /dmax 2026-12-31 /amin 1 /amax 50 /sort asc",
                 ui) instanceof FindCommand);
     }
+
+    @Test
+    public void parse_emptyString_returnsNull() {
+        assertNull(Parser.parse("", ui));
+    }
+
+    @Test
+    public void parse_listWithArgs_returnsNull() {
+        assertNull(Parser.parse("list extra", ui));
+    }
+
+    @Test
+    public void parse_helpWithArgs_returnsNull() {
+        assertNull(Parser.parse("help me", ui));
+    }
+
+    @Test
+    public void parse_totalWithArgs_returnsNull() {
+        assertNull(Parser.parse("total stuff", ui));
+    }
+
+    @Test
+    public void parse_exitWithArgs_returnsNull() {
+        assertNull(Parser.parse("exit now", ui));
+    }
+
+    @Test
+    public void parse_deleteNegativeIndex_returnsNull() {
+        assertNull(Parser.parse("delete -1", ui));
+    }
+
+    @Test
+    public void parse_addCommandNanAmount_returnsNull() {
+        assertNull(Parser.parse("add NaN Coffee", ui));
+    }
+
+    @Test
+    public void parse_addCommandInfinityAmount_returnsNull() {
+        assertNull(Parser.parse("add Infinity Coffee", ui));
+    }
+
+    @Test
+    public void parse_editCommandEmptyCategoryInMiddle_returnsNull() {
+        assertNull(Parser.parse("edit 1 /c /da 2026-04-01", ui));
+    }
+
+    @Test
+    public void parse_lendCommandEmptyDateValue_returnsNull() {
+        assertNull(Parser.parse("lend 20.00 John /da", ui));
+    }
+
+    @Test
+    public void parse_lendCommandInfinityAmount_returnsNull() {
+        assertNull(Parser.parse("lend Infinity John", ui));
+    }
+
+    @Test
+    public void parse_lendCommandNanAmount_returnsNull() {
+        assertNull(Parser.parse("lend NaN John", ui));
+    }
+
+    @Test
+    public void parse_lendCommandDateBeforeBorrower_returnsLendCommand() {
+        assertTrue(Parser.parse("lend 20.00 /da 2026-04-01 John", ui) instanceof LendCommand);
+    }
 }
