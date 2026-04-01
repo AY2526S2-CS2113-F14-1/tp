@@ -224,14 +224,18 @@ public class UiTest {
 
         assertTrue(captureOutput(ui::showFindUsage).contains("Usage: find KEYWORD"));
 
-        String emptyKeywordOnly = captureOutput(() -> ui.showFindResults(new ArrayList<>(), "lunch", null));
+        String emptyKeywordOnly = captureOutput(() -> ui.showFindResults(new ArrayList<>(),
+                "lunch", null));
         assertTrue(emptyKeywordOnly.contains("No expenses found matching: \"lunch\""));
 
-        String emptyCategoryOnly = captureOutput(() -> ui.showFindResults(new ArrayList<>(), "", "Food"));
+        String emptyCategoryOnly = captureOutput(() -> ui.showFindResults(new ArrayList<>(),
+                "", "Food"));
         assertTrue(emptyCategoryOnly.contains("No expenses found matching: category [Food]"));
 
-        String resultKeywordAndCategory = captureOutput(() -> ui.showFindResults(results, "lunch", "Food"));
-        assertTrue(resultKeywordAndCategory.contains("Here are the matching expenses for \"lunch\" in category [Food]:"));
+        String resultKeywordAndCategory = captureOutput(() -> ui.showFindResults(results,
+                "lunch", "Food"));
+        assertTrue(resultKeywordAndCategory.contains("Here are the matching expenses for \"lunch\"" +
+                " in category [Food]:"));
         assertTrue(resultKeywordAndCategory.contains("1. " + expense));
     }
 
@@ -337,7 +341,8 @@ public class UiTest {
         assertTrue(repaidOutput.contains(loan1.toString()));
 
         assertTrue(captureOutput(ui::showNoOutstandingLoans).contains("There are no outstanding loans to repay."));
-        assertTrue(captureOutput(() -> ui.showInvalidLoanIndex(3)).contains("Invalid loan index! There are 3 outstanding loan(s)."));
+        assertTrue(captureOutput(() -> ui.showInvalidLoanIndex(3)).contains("Invalid loan index! " +
+                "There are 3 outstanding loan(s)."));
         assertTrue(captureOutput(ui::showLendUsage).contains("Usage: lend <amount> <borrower name>"));
         assertTrue(captureOutput(ui::showLoansUsage).contains("loans /all"));
         assertTrue(captureOutput(ui::showRepayUsage).contains("Usage: repay <index>"));
