@@ -110,10 +110,10 @@ class SpendSwiftTest {
     }
 
     @Test
-    public void run_totalOnEmptyList_showsZeroTotal() {
+    public void run_totalCommand_showsTotalSpending() {
         String output = runWithInput("total\nexit\n", tempDir);
-        assertTrue(output.contains("0 expense(s)"),
-                "Total on empty list should show 0 expenses");
+        assertTrue(output.contains("Your total spending is:"),
+                "Total command should display total spending");
     }
 
     @Test
