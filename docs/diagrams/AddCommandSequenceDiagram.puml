@@ -1,15 +1,41 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+skinparam backgroundColor white
+hide footbox
 
-autonumber
+actor User
+participant ":SpendSwift" as SpendSwift
+participant ":Parser" as Parser
+participant ":AddCommand" as AddCommand
+participant ":ExpenseList" as ExpenseList
+participant ":Ui" as Ui
 
-== Initialization ==
+User -> SpendSwift : enter add command
+SpendSwift -> Parser : parseAddCommand(input)
+Parser --> SpendSwift : AddCommand
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+SpendSwift -> AddCommand : execute(expenseList)
 
-== Repetition ==
+alt category not provided
+    AddCommand -> ExpenseList : getCategories()
+    ExpenseList --> AddCommand : categories
+    AddCommand -> Ui : showCategoryPrompt(categories)
+    AddCommand -> Ui : getUserInput()
+    Ui --> AddCommand : selectedCategory
+end
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+AddCommand -> AddCommand : create Expense
+AddCommand -> ExpenseList : addExpense(expense)
+ExpenseList --> AddCommand
+
+AddCommand -> Ui : showAddExpense(expense, size)
+
+opt budget exceeded
+    AddCommand -> ExpenseList : isOverBudget()
+    ExpenseList --> AddCommand : true
+    AddCommand -> ExpenseList : getBudget()
+    ExpenseList --> AddCommand : budget
+    AddCommand -> ExpenseList : getTotal()
+    ExpenseList --> AddCommand : total
+    AddCommand -> Ui : showBudgetExceededWarning(budget, total)
+end
 @enduml
