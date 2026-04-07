@@ -133,7 +133,7 @@ public class ExpenseList {
     /**
      * Sets or overwrites the budget for the specified month.
      *
-     * @param month The month for which the budget is being set.
+     * @param month  The month for which the budget is being set.
      * @param budget The budget amount to store. Must be greater than 0.
      * @throws IllegalArgumentException If the month is null or the budget is not greater than 0.
      */

@@ -14,7 +14,7 @@ public class ListCommand extends Command {
     /**
      * Constructs a ListCommand with the specified Ui instance and optional month filter.
      *
-     * @param ui The Ui object used to display messages.
+     * @param ui    The Ui object used to display messages.
      * @param month The month to filter by, or null to list all expenses.
      */
     public ListCommand(Ui ui, YearMonth month) {

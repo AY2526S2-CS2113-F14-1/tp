@@ -210,7 +210,7 @@ public class Parser {
      * list YYYY-MM
      *
      * @param arguments The portion of user input after the list keyword.
-     * @param ui The Ui instance used to display error or usage messages.
+     * @param ui        The Ui instance used to display error or usage messages.
      * @return A fully constructed ListCommand, or null if the input is invalid.
      */
     private static Command parseListCommand(String arguments, Ui ui) {

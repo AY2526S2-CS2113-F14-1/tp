@@ -14,6 +14,7 @@ public class ExitCommand extends Command {
     public ExitCommand(Ui ui) {
         super(ui);
     }
+
     @Override
     public void execute(ExpenseList expenseList) {
         // Sets the flag so the main loop knows to stop

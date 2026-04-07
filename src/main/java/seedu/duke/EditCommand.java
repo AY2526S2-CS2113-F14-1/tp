@@ -61,10 +61,10 @@ public class EditCommand extends Command {
 
         Expense existing = expenseList.getExpense(zeroBasedIndex);
 
-        double    updatedAmount      = (newAmount      != null) ? newAmount      : existing.getAmount();
-        String    updatedDescription = (newDescription != null) ? newDescription : existing.getDescription();
-        String    updatedCategory    = (newCategory    != null) ? newCategory    : existing.getCategory();
-        LocalDate updatedDate        = (newDate        != null) ? newDate        : existing.getDate();
+        double updatedAmount = (newAmount != null) ? newAmount : existing.getAmount();
+        String updatedDescription = (newDescription != null) ? newDescription : existing.getDescription();
+        String updatedCategory = (newCategory != null) ? newCategory : existing.getCategory();
+        LocalDate updatedDate = (newDate != null) ? newDate : existing.getDate();
 
         Expense updated = new Expense(updatedDescription, updatedAmount, updatedCategory, updatedDate);
         expenseList.setExpense(zeroBasedIndex, updated);

@@ -14,8 +14,8 @@ public class BudgetCommand extends Command {
     /**
      * Constructs a BudgetCommand with the specified Ui, target month, and optional budget amount.
      *
-     * @param ui The Ui object used to display user-facing messages.
-     * @param budgetMonth The month whose budget is being viewed or set.
+     * @param ui           The Ui object used to display user-facing messages.
+     * @param budgetMonth  The month whose budget is being viewed or set.
      * @param budgetAmount The budget amount to set, or null if displaying budget details only.
      */
     public BudgetCommand(Ui ui, YearMonth budgetMonth, Double budgetAmount) {
