@@ -1,5 +1,7 @@
 package seedu.duke;
+
 import java.time.LocalDate;
+
 /**
  * Represents a single financial expense tracked by the user.
  * Contains the description, monetary amount, category, and date of the expense.
@@ -10,6 +12,7 @@ public class Expense {
     private final double amount;
     private final String category;
     private final LocalDate date;
+
     /**
      * Constructs an Expense with all four fields supplied explicitly.
      * A null or blank category defaults to "Others".
@@ -41,6 +44,7 @@ public class Expense {
         this.date = (date == null) ? LocalDate.now() : date;
         assert this.date != null : "Date should not be null after assignment";
     }
+
     /**
      * Constructs an Expense using the default category "Others" and today's date.
      *
@@ -50,6 +54,7 @@ public class Expense {
     public Expense(String description, double amount) {
         this(description, amount, DEFAULT_CATEGORY, LocalDate.now());
     }
+
     /**
      * Returns the description of the expense.
      *
@@ -58,6 +63,7 @@ public class Expense {
     public String getDescription() {
         return description;
     }
+
     /**
      * Returns the monetary amount of the expense.
      *
@@ -66,6 +72,7 @@ public class Expense {
     public double getAmount() {
         return amount;
     }
+
     /**
      * Returns the spending category of the expense.
      *
@@ -74,6 +81,7 @@ public class Expense {
     public String getCategory() {
         return category;
     }
+
     /**
      * Returns the date of the expense.
      *
@@ -82,6 +90,7 @@ public class Expense {
     public LocalDate getDate() {
         return date;
     }
+
     /**
      * Returns a formatted string showing the description, amount, category, and date.
      *
