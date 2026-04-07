@@ -1,60 +1,128 @@
 package seedu.duke;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import seedu.duke.ui.Ui;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.time.LocalDate;
+import java.time.YearMonth;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ListCommandTest {
 
     private static final String LINE = "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
 
+    private final PrintStream originalOut = System.out;
+
+    @AfterEach
+    public void restoreSystemOut() {
+        System.setOut(originalOut);
+    }
+
+    private String captureOutput(Runnable action) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        action.run();
+        return out.toString().replace("\r\n", "\n");
+    }
+
     @Test
     public void execute_emptyList_executesWithoutException() {
         Ui ui = new Ui();
         ExpenseList expenseList = new ExpenseList();
-        ListCommand listCommand = new ListCommand(ui);
+        ListCommand listCommand = new ListCommand(ui, null);
 
-        // Verify it handles an empty list gracefully
-        assertDoesNotThrow(() -> listCommand.execute(expenseList),
-                "ListCommand should execute successfully on an empty list");
+        assertDoesNotThrow(() -> listCommand.execute(expenseList));
     }
 
     @Test
     public void execute_emptyList_outputWrappedWithLines() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream original = System.out;
-        System.setOut(new PrintStream(out));
-
         Ui ui = new Ui();
         ExpenseList expenseList = new ExpenseList();
-        new ListCommand(ui).execute(expenseList);
 
-        System.setOut(original);
-        String output = out.toString();
-        String[] lines = output.split(System.lineSeparator());
+        String output = captureOutput(() -> new ListCommand(ui, null).execute(expenseList));
 
-        // First and last printed lines must both be the LINE separator
-        assertEquals(LINE, lines[0], "Output should open with LINE");
-        assertEquals(LINE, lines[lines.length - 1], "Empty list output must close with LINE");
+        assertTrue(output.startsWith(LINE));
+        assertTrue(output.contains("Your expense list is currently empty."));
+        assertTrue(output.trim().endsWith(LINE));
     }
 
     @Test
     public void execute_populatedList_executesWithoutException() {
         Ui ui = new Ui();
         ExpenseList expenseList = new ExpenseList();
+        expenseList.addExpense(new Expense("Lunch", 10.50, "Food", LocalDate.of(2026, 4, 5)));
+        expenseList.addExpense(new Expense("Bus Fare", 2.00, "Transport", LocalDate.of(2026, 4, 6)));
 
-        // Add some dummy data
-        expenseList.addExpense(new Expense("Lunch", 10.50, null, null));
-        expenseList.addExpense(new Expense("Bus Fare", 2.00, null, null));
+        ListCommand listCommand = new ListCommand(ui, null);
 
-        ListCommand listCommand = new ListCommand(ui);
+        assertDoesNotThrow(() -> listCommand.execute(expenseList));
+    }
 
-        // Verify it iterates and prints a populated list without crashing
-        assertDoesNotThrow(() -> listCommand.execute(expenseList),
-                "ListCommand should execute successfully on a populated list");
+    @Test
+    public void execute_populatedList_printsExpenses() {
+        Ui ui = new Ui();
+        ExpenseList expenseList = new ExpenseList();
+        Expense lunch = new Expense("Lunch", 10.50, "Food", LocalDate.of(2026, 4, 5));
+        Expense busFare = new Expense("Bus Fare", 2.00, "Transport", LocalDate.of(2026, 4, 6));
+        expenseList.addExpense(lunch);
+        expenseList.addExpense(busFare);
+
+        String output = captureOutput(() -> new ListCommand(ui, null).execute(expenseList));
+
+        assertTrue(output.contains("Here are your tracked expenses:"));
+        assertTrue(output.contains("1. "));
+        assertTrue(output.contains("2. "));
+        assertTrue(output.contains(lunch.toString()));
+        assertTrue(output.contains(busFare.toString()));
+    }
+
+    @Test
+    public void execute_monthlyList_executesWithoutException() {
+        Ui ui = new Ui();
+        ExpenseList expenseList = new ExpenseList();
+        expenseList.addExpense(new Expense("Lunch", 10.50, "Food", LocalDate.of(2026, 4, 5)));
+        expenseList.addExpense(new Expense("Movie", 15.00, "Entertainment", LocalDate.of(2026, 5, 1)));
+
+        ListCommand listCommand = new ListCommand(ui, YearMonth.of(2026, 4));
+
+        assertDoesNotThrow(() -> listCommand.execute(expenseList));
+    }
+
+    @Test
+    public void execute_monthlyList_printsOnlyRequestedMonth() {
+        Ui ui = new Ui();
+        ExpenseList expenseList = new ExpenseList();
+
+        Expense aprilExpense = new Expense("Lunch", 10.50, "Food", LocalDate.of(2026, 4, 5));
+        Expense mayExpense = new Expense("Movie", 15.00, "Entertainment", LocalDate.of(2026, 5, 1));
+
+        expenseList.addExpense(aprilExpense);
+        expenseList.addExpense(mayExpense);
+
+        String output = captureOutput(
+                () -> new ListCommand(ui, YearMonth.of(2026, 4)).execute(expenseList)
+        );
+
+        assertTrue(output.contains("Here are your tracked expenses for 2026-04:"));
+        assertTrue(output.contains(aprilExpense.toString()));
+        assertTrue(!output.contains(mayExpense.toString()));
+    }
+
+    @Test
+    public void execute_monthlyList_noExpensesForMonth_printsEmptyMonthMessage() {
+        Ui ui = new Ui();
+        ExpenseList expenseList = new ExpenseList();
+        expenseList.addExpense(new Expense("Movie", 15.00, "Entertainment", LocalDate.of(2026, 5, 1)));
+
+        String output = captureOutput(
+                () -> new ListCommand(ui, YearMonth.of(2026, 4)).execute(expenseList)
+        );
+
+        assertTrue(output.contains("No expenses found for 2026-04."));
     }
 }
