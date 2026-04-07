@@ -339,15 +339,7 @@ public class Ui {
         System.out.println("Use: budget " + month + " <amount>");
         System.out.println(LINE);
     }
-
-    /**
-     * Displays the current budget details, including total spent and remaining budget.
-     * If the budget is exceeded, the exceeded amount is shown instead.
-     *
-     * @param budget The currently set budget.
-     * @param totalSpent The total amount spent.
-     * @param remaining The remaining budget. Can be negative if exceeded.
-     */
+    
     /**
      * Displays the budget details for a specific month, including total spent and remaining budget.
      * If the budget is exceeded, the exceeded amount is shown instead.
