@@ -24,11 +24,11 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_validIndex_removesCorrectExpense() {
-        // User types "delete 1" -> refers to "Lunch"
-        DeleteCommand deleteCommand = new DeleteCommand(ui, 1);
+        // User types "delete 2" -> refers to "Lunch" (because Dinner is placed first by date)
+        DeleteCommand deleteCommand = new DeleteCommand(ui, 2);
         deleteCommand.execute(expenseList);
 
-        assertEquals(1, expenseList.getSize());
+        assertEquals(2, expenseList.getSize());
         assertEquals("Dinner", expenseList.getExpense(0).getDescription());
     }
 
@@ -39,7 +39,7 @@ public class DeleteCommandTest {
         deleteCommand.execute(expenseList);
 
         // Should handle the error gracefully and keep the list intact
-        assertEquals(2, expenseList.getSize());
+        assertEquals(3, expenseList.getSize());
     }
 
     @Test

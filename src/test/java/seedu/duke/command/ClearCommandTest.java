@@ -8,6 +8,7 @@ import seedu.duke.parser.Parser;
 import seedu.duke.ui.Ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,7 +62,7 @@ public class ClearCommandTest {
     }
 
     @Test
-    public void execute_emptyList_remainsEmpty_whenConfirmed() {
+    public void execute_emptyList_remainsEmpty() {
         ExpenseList emptyList = new ExpenseList();
         assertEquals(0, emptyList.getSize());
 
