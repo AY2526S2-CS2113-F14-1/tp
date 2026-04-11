@@ -258,7 +258,7 @@ public class Parser {
 
         YearMonth parsedMonth = parseYearMonth(arguments);
         if (parsedMonth == null) {
-            ui.showUnknownCommand();
+            ui.showInvalidMonthYear();
             return null;
         }
 

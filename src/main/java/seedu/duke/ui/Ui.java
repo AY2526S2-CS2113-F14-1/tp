@@ -836,5 +836,11 @@ public class Ui {
         System.out.printf("Average Monthly:   $%.2f%n", annualSpent / 12.0);
         System.out.println(LINE);
     }
+
+    public void showInvalidMonthYear() {
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        System.out.println("Invalid month/year format.");
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    }
 }
 
