@@ -56,3 +56,4 @@ public class ClearCommand extends Command {
         return hasCleared;
     }
 }
+
