@@ -20,16 +20,7 @@ public class Ui {
      * Displays the welcome message when the application starts.
      */
     public void showWelcome() {
-        System.out.println();
-        System.out.println("  +-----------------------------------------------------+");
-        System.out.println("  |                                                     |");
-        System.out.println("  |     $$$$  SPEND  SWIFT  $$$$                        |");
-        System.out.println("  |                                                     |");
-        System.out.println("  |     Track  |  Budget  |  Sort  |  Forecast          |");
-        System.out.println("  |                                                     |");
-        System.out.println("  |     Your Personal Finance Tracker (CLI)             |");
-        System.out.println("  +-----------------------------------------------------+");
-        System.out.println();
+        WelcomeBanner.printBanner();
         System.out.println(LINE);
         System.out.println("Hello! I'm SpendSwift.");
         System.out.println("What expenses are we tracking today?");
