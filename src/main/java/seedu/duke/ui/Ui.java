@@ -20,6 +20,19 @@ public class Ui {
      * Displays the welcome message when the application starts.
      */
     public void showWelcome() {
+        // CHECKSTYLE.OFF: LineLength
+        System.out.println();
+        System.out.println("    +=========================================================+");
+        System.out.println("    |   ___                     _  ___          _  __ _        |");
+        System.out.println("    |  / __|_ __  ___ _ _   __| |/ __|_ __ __ (_)/ _| |_      |");
+        System.out.println("    |  \\__ \\ '_ \\/ -_) ' \\ / _` |\\__ \\ V  V /| |  _|  _|     |");
+        System.out.println("    |  |___/ .__/\\___|_||_|\\__,_||___/\\_/\\_/ |_|_|  \\__|     |");
+        System.out.println("    |      |_|                                                 |");
+        System.out.println("    |                                                          |");
+        System.out.println("    |        Your Personal Finance Tracker (CLI)               |");
+        System.out.println("    +=========================================================+");
+        // CHECKSTYLE.ON: LineLength
+        System.out.println();
         System.out.println(LINE);
         System.out.println("Hello! I'm SpendSwift.");
         System.out.println("What expenses are we tracking today?");
