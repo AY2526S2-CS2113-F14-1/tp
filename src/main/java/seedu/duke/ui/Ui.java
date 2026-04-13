@@ -20,6 +20,7 @@ public class Ui {
      * Displays the welcome message when the application starts.
      */
     public void showWelcome() {
+        WelcomeBanner.printBanner();
         System.out.println(LINE);
         System.out.println("Hello! I'm SpendSwift.");
         System.out.println("What expenses are we tracking today?");
