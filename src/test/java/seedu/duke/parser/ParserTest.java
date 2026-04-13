@@ -584,4 +584,19 @@ public class ParserTest {
     public void parse_lendCommandDateBeforeBorrower_returnsLendCommand() {
         assertTrue(Parser.parse("lend 20.00 /da 2026-04-01 John", ui) instanceof LendCommand);
     }
+
+    @Test
+    public void parse_helpAdd_returnsNull() {
+        assertNull(Parser.parse("help add", ui));
+    }
+
+    @Test
+    public void parse_helpUnknownCommand_returnsNull() {
+        assertNull(Parser.parse("help xyz", ui));
+    }
+
+    @Test
+    public void parse_helpNoArgs_returnsHelpCommand() {
+        assertTrue(Parser.parse("help", ui) instanceof HelpCommand);
+    }
 }
