@@ -130,7 +130,7 @@ public class Ui {
         System.out.println("  delete INDEX                              - Delete an expense by index");
         System.out.println("  edit INDEX [/a AMOUNT] [/de DESC]         - Edit an existing expense");
         System.out.println("             [/c CATEGORY] [/da DATE]");
-        System.out.println("  find KEYWORD [/c CAT] [/dmin DATE]        - Find/filter expenses");
+        System.out.println("  find [KEYWORD] [/c CAT] [/dmin DATE]      - Find/filter expenses");
         System.out.println("       [/dmax DATE] [/amin AMT] [/amax AMT] [/sort asc|desc]");
         System.out.println("  sort category|date                        - Sort expenses");
         System.out.println("  stats                                     - Show spending statistics and graph " +
@@ -461,7 +461,7 @@ public class Ui {
      */
     public void showFindUsage() {
         System.out.println(LINE);
-        System.out.println("Usage: find KEYWORD [/c CATEGORY] [/dmin DATE]"
+        System.out.println("Usage: find [KEYWORD] [/c CATEGORY] [/dmin DATE]"
                 + " [/dmax DATE] [/amin AMT] [/amax AMT] [/sort asc|desc]");
         System.out.println("  find lunch                    - search by keyword");
         System.out.println("  find /c Food                  - list all in category");
