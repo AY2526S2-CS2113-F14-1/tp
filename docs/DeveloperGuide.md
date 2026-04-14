@@ -36,7 +36,7 @@
 * Testing is supported by the [JUnit 5](https://junit.org/junit5/) framework.
 * Project structure and documentation draw inspiration from the SE-EDU guidelines.
 
-## Design & implementation
+## Design & Implementation
 
 This section describes the internal design of SpendSwift and explains how the main components and selected features are implemented.
 
@@ -603,13 +603,13 @@ Below is the sequence of interactions when the user enters `clear`:
 
 ## Product Scope
 
-### Target user profile
+### Target User Profile
 
 * **Demographic:** University students (like those at NUS) and young professionals.
 * **Habits:** Spends a lot of time on their computer/terminal, prefers typing over mouse interactions, and wants a fast, no-nonsense way to log daily expenses (like meals and transport).
 * **Needs:** Needs a way to enforce a strict budget, categorize spending, and maintain data locally without relying on cloud services or slow mobile apps.
 
-### Value proposition
+### Value Proposition
 
 SpendSwift solves the problem of friction in financial tracking. Most budgeting apps require navigating multiple menus and screens just to log a $5 coffee. SpendSwift allows power users to log, edit, and review their finances instantly using simple Command Line Interface (CLI) commands, keeping their hands on the keyboard and their focus unbroken.
 
@@ -660,7 +660,7 @@ SpendSwift solves the problem of friction in financial tracking. Most budgeting 
 * **Architecture** - The overall structural design of the software, determining how different components (like Parser, Storage, and Commands) interact.
 * **Persisted Data** - Information that is saved to the user's hard drive (in `expenses.txt`) so it is not lost when the application closes.
 
-## Instructions for manual testing
+## Instructions For Manual Testing
 
 Given below are instructions to test the app manually.
 
