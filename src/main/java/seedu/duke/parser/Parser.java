@@ -369,6 +369,10 @@ public class Parser {
         }
 
         String flagSection = (indexSplit.length > 1) ? indexSplit[1].trim() : "";
+        if (flagSection.contains("|")) {
+            ui.showInvalidCharacterWarning();
+            return null;
+        }
         if (flagSection.isEmpty()) {
             ui.showEditUsage();
             return null;
@@ -633,6 +637,27 @@ public class Parser {
         Double amountMax = null;
         String sortOrder = null;
 
+        if (workingStr.indexOf("/sort") != workingStr.lastIndexOf("/sort")) {
+            ui.showDuplicateFlagWarning("/sort");
+            return null;
+        }
+        if (workingStr.indexOf("/amin") != workingStr.lastIndexOf("/amin")) {
+            ui.showDuplicateFlagWarning("/amin");
+            return null;
+        }
+        if (workingStr.indexOf("/amax") != workingStr.lastIndexOf("/amax")) {
+            ui.showDuplicateFlagWarning("/amax");
+            return null;
+        }
+        if (workingStr.indexOf("/dmin") != workingStr.lastIndexOf("/dmin")) {
+            ui.showDuplicateFlagWarning("/dmin");
+            return null;
+        }
+        if (workingStr.indexOf("/dmax") != workingStr.lastIndexOf("/dmax")) {
+            ui.showDuplicateFlagWarning("/dmax");
+            return null;
+        }
+
         if (workingStr.contains("/sort")) {
             int flagIdx = workingStr.indexOf("/sort");
             String after = workingStr.substring(flagIdx + "/sort".length()).trim();
@@ -654,6 +679,10 @@ public class Parser {
             String[] tokens = after.split("\\s+", 2);
             try {
                 amountMin = Double.parseDouble(tokens[0]);
+                if (amountMin < 0) {
+                    ui.showInvalidAmount();
+                    return null;
+                }
             } catch (NumberFormatException e) {
                 ui.showInvalidAmount();
                 return null;
@@ -669,6 +698,10 @@ public class Parser {
             String[] tokens = after.split("\\s+", 2);
             try {
                 amountMax = Double.parseDouble(tokens[0]);
+                if (amountMax < 0) {
+                    ui.showInvalidAmount();
+                    return null;
+                }
             } catch (NumberFormatException e) {
                 ui.showInvalidAmount();
                 return null;

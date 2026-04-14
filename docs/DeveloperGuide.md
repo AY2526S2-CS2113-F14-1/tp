@@ -323,9 +323,12 @@ The user types `find` followed by an optional keyword and any combination of the
 All filters are composable: `find lunch /c Food /amin 5 /sort asc` finds expenses containing "lunch" in the Food category costing at least $5, sorted cheapest-first.
 
 **Implementation:**
-`Parser.parseFindCommand()` strips each recognised flag from the input string one at a time, using the same `indexOf()`-based algorithm as `parseAddCommand()`. The remaining text after all flags have been extracted becomes the keyword. If neither a keyword nor any filter flag is present, usage help is shown and `null` is returned.
+`Parser.parseFindCommand()` first checks for duplicate flags using the `indexOf()` vs `lastIndexOf()` pattern (same as `parseAddCommand()`). It then strips each recognised flag one at a time. The remaining text becomes the keyword. If neither a keyword nor any filter flag is present, usage help is shown and `null` is returned.
 
-After all flags are extracted, `parseFindCommand()` validates that any amount range (`/amin` <= `/amax`) and date range (`/dmin` <= `/dmax`) are logically consistent. Reversed ranges are rejected with `showInvalidAmountRange()` or `showInvalidDateRange()` and `null` is returned.
+After all flags are extracted, `parseFindCommand()` validates:
+- Negative `/amin` and `/amax` values are rejected (expenses cannot have negative amounts).
+- Amount range is logically consistent (`/amin` <= `/amax`). Reversed ranges are rejected with `showInvalidAmountRange()`.
+- Date range is logically consistent (`/dmin` <= `/dmax`). Reversed ranges are rejected with `showInvalidDateRange()`.
 
 A `FindCommand` is constructed with all seven parameters (keyword, category, dateMin, dateMax, amountMin, amountMax, sortOrder). During execution, each expense is tested against four private predicate methods — `matchesCategory()`, `matchesKeyword()`, `matchesDateRange()`, and `matchesAmountRange()` — each of which returns `true` when its corresponding filter is `null` (i.e., not set). This design means all filters are independently optional and composable without any conditional branching in the main loop.
 

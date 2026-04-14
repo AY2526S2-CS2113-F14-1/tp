@@ -292,7 +292,7 @@ public class UiTest {
         assertTrue(budgetUsageOutput.contains("budget <YYYY-MM> <amount>"));
 
         assertTrue(captureOutput(ui::showInvalidBudget)
-                .contains("Budget must be a number greater then 0."));
+                .contains("Budget must be a number greater than 0."));
     }
 
     @Test

@@ -27,6 +27,9 @@ This section summarizes my specific contributions to the project. My primary foc
     * Fixed help text inconsistency where `find KEYWORD` was shown as required instead of optional (#156)
     * Added per-command help (`help add`, `help find`, etc.) reusing existing Ui usage methods (#122)
     * Split Storage UML diagram into separate load and save diagrams for PDF readability (#170, #171, #172)
+    * Added pipe character validation to edit command to prevent save file corruption
+    * Added negative amount rejection for find `/amin` and `/amax` filters
+    * Added duplicate flag detection for all find filter flags (`/sort`, `/amin`, `/amax`, `/dmin`, `/dmax`)
 
 * **Contributions to the UG**:
     * Authored the `find`, `delete`, `budget`, `stats`, and `help` command sections.
