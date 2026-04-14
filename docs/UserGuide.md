@@ -1,4 +1,31 @@
-# SpendSwift - User Guide
+# User Guide
+
+## Table of Contents
+* [Introduction](#introduction)
+* [Quick Start](#quick-start)
+* [Notes about the Command Format](#notes-about-the-command-format)
+* [Notes on User Interaction](#notes-on-user-interaction)
+* [Features](#features)
+  * [Adding an expense: `add`](#adding-an-expense-add)
+  * [Editing an expense: `edit`](#editing-an-expense-edit)
+  * [Listing expenses: `list`](#listing-expenses-list)
+  * [Calculating overall total: `total`](#calculating-overall-total-total)
+  * [Deleting an expense: `delete`](#deleting-an-expense-delete)
+  * [Setting and viewing a monthly budget: `budget`](#setting-and-viewing-a-monthly-budget-budget)
+  * [Finding and filtering expenses: `find`](#finding-and-filtering-expenses-find)
+  * [Viewing statistics: `stats`](#viewing-statistics-stats)
+  * [Viewing help: `help`](#viewing-help-help)
+  * [Sorting expenses: `sort`](#sorting-expenses-sort)
+  * [Tracking money lent: `lend`](#tracking-money-lent-lend)
+  * [Recording a repayment: `repay`](#recording-a-repayment-repay)
+  * [Viewing all loans: `loans`](#viewing-all-loans-loans)
+  * [Forecasting spending: `forecast`](#forecasting-spending-forecast)
+  * [Clearing all expenses: `clear`](#clearing-all-expenses-clear)
+  * [Exiting the program: `exit`](#exiting-the-program-exit)
+* [FAQ](#faq)
+* [Command Summary](#command-summary)
+
+<div style="page-break-after: always;"></div>
 
 ## Introduction
 
@@ -25,30 +52,38 @@ Whether you are a university student tracking daily meals or managing a strict b
 
 ---
 
+<div style="page-break-after: always;"></div>
+
 ## Notes about the Command Format
 
-Before diving into the features, here are a few things to keep in mind regarding how SpendSwift reads your commands:
+Before diving into the features, here are the strict rules regarding how SpendSwift interprets your commands. **Please keep these in mind to ensure smooth operation:**
 
-* Words in `UPPER_CASE` are the parameters to be supplied by the user.
-    * *e.g., in `add AMOUNT DESCRIPTION`, `AMOUNT` is a parameter which can be used as `add 5.00 Coffee`.*
-* Items in square brackets `[ ]` are optional.
-    * *e.g., `[/c CATEGORY]` can be used as `/c Food` or can be left out entirely.*
-* **Restricted Characters:** The pipe character (`|`) is strictly reserved for internal data saving. Do not use `|` in your descriptions or categories.
-* **Maximum Values:** To prevent floating-point precision errors, the maximum allowable expense amount is $999,999,999,999.99 (Just under 1 Trillion).
-* **No Duplicate Flags:** You may only use a specific flag (like `/c` or `/da`) once per command.
+* **Parameters:** Words in `UPPER_CASE` are the parameters to be supplied by the user.
+  * *e.g., in `add AMOUNT DESCRIPTION`, `AMOUNT` is a parameter which can be used as `add 5.00 Coffee`.*
+* **Optional Fields:** Items in square brackets `[ ]` are optional.
+  * *e.g., `[/c CATEGORY]` can be used as `/c Food` or can be left out entirely.*
+* **Case Insensitivity:** Command keywords are case-insensitive. Typing `add`, `ADD`, or `aDd` will all execute the same command. Sorting arguments (like `date` or `amount`) are also case-insensitive.
+* **Restricted Characters:** * The pipe character (`|`) is strictly reserved for internal data saving.
+  * **Do not use the forward-slash (`/`)** inside your descriptions, categories, or borrower names. SpendSwift uses `/` exclusively to detect command flags (like `/c` or `/da`). Using extra slashes in your text will cause parsing errors.
+* **Amount Limits:** To maintain system stability and prevent floating-point precision loss, all monetary amounts (expenses, budgets, and loans) must be strictly greater than `$0.00` and strictly less than `$1,000,000,000,000.00` (One Trillion).
+* **Date Limits:** All dates must be valid calendar dates strictly between the years `2000` and `2100`.
+* **Flag Usage:** Flags (like `/c` or `/da`) can be provided in **any order**. However, you may only use a specific flag **once** per command.
+* **Strict Commands:** Commands that do not require parameters (like `total`, `forecast`, `clear`, and `exit`) are strictly validated. Adding any extra text or characters after these keywords will cause the command to be rejected.
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Notes on User Interaction
 
 SpendSwift provides interactive feedback to guide users:
 
 - Confirmation messages are shown after successful state-changing commands such as adding, editing, deleting, and setting or updating budgets.
-- Warning messages are displayed for invalid inputs and when a monthly budget has been exceeded.
+- Warning messages are displayed for invalid inputs, missing fields, and when a monthly budget has been exceeded.
 - Some commands (such as `add`) may trigger interactive prompts to request additional input.
 - Read-only commands such as `budget` and `budget YYYY-MM` display the current budget status without changing saved data.
 
-These interactions ensure that users receive immediate feedback and guidance while using the application.
+These interactions ensure that you receive immediate feedback and guidance while using the application.
 
 ---
 
@@ -59,9 +94,10 @@ Adds a new expense to your tracking list.
 
 **Format:** `add AMOUNT [/c CATEGORY] [/da YYYY-MM-DD] DESCRIPTION`
 
-* `AMOUNT` must be a valid number greater than 0.
+* `AMOUNT` must be a valid number greater than 0 and less than 1 Trillion.
 * If `/da` (date) is not provided, the expense will default to the current date.
 * If `/c` (category) is not provided, an interactive prompt will appear.
+* **Do not** use extra `/` or `|` characters in your description.
 
 **Interactive Prompt:**
 If no category is specified, SpendSwift will display a numbered list of available categories. You may:
@@ -78,8 +114,15 @@ Edits an existing expense in your list. You only need to provide the flags for t
 
 **Format:** `edit INDEX [/a NEW_AMOUNT] [/de NEW_DESC] [/c NEW_CATEGORY] [/da YYYY-MM-DD]`
 
-**Example:**
-* `edit 1 /a 15.00 /c Fast Food`
+**Rules:**
+* At least one flag must be provided.
+* Flags can be provided in **any order**.
+* **Do not** use extra `/` characters in your new description or category, as it will confuse the parser.
+
+**Examples of Combinations:**
+* `edit 1 /a 15.00 /c Food` *(Updates the amount to $15.00 and category to Food)*
+* `edit 2 /de Chicken Noodles` *(Updates only the description of the 2nd expense)*
+* `edit 3 /da 2026-04-10 /a 5.50 /de Lunch` *(Updates the date, amount, and description simultaneously. Notice the order of flags does not matter)*
 
 
 ### Listing expenses: `list`
@@ -102,6 +145,8 @@ Shows your recorded expenses. You may list all expenses or only the expenses for
 Displays the absolute sum of all expenses currently in your list for a quick snapshot of your spending.
 
 **Format:** `total`
+
+*Note on extremely large numbers: SpendSwift caps individual expenses at just under 1 Trillion dollars. While you can technically accumulate astronomical totals across thousands of entries, doing so may eventually result in slight floating-point precision loss at the decimal level. We assume regular personal budgeting will not reasonably reach these limits!*
 
 
 ### Deleting an expense: `delete`
@@ -141,13 +186,6 @@ Sets, updates, or views a monthly spending budget.
 - If a budget already exists for that month, setting a new one overwrites the old value.
 - Budgets are tracked separately for each month.
 - Budget amounts are displayed to 2 decimal places in user-facing messages.
-- If more than 2 decimal places are entered, the displayed value is rounded accordingly.
-
-**Invalid input handling:**
-- If the month argument is invalid, SpendSwift shows the budget usage message.
-- If the command contains too many arguments, SpendSwift shows the budget usage message.
-- If an amount is provided in a valid budget-setting form but is invalid, SpendSwift shows: `Budget must be a number greater then 0.`
-- If `AMOUNT` is not greater than 0, SpendSwift shows: `Budget must be a number greater then 0.`
 
 **When viewing a budget:**
 - If a budget has been set for that month, SpendSwift shows:
@@ -160,7 +198,6 @@ Sets, updates, or views a monthly spending budget.
 - SpendSwift sets the budget for the target month.
 - If a budget already existed for that month, SpendSwift shows an update message with the old and new values.
 - If spending for that month already exceeds the newly set budget, SpendSwift immediately shows a budget-exceeded warning.
-- Budget values shown in confirmations and warnings are formatted to 2 decimal places.
 
 **Examples:**
 * `budget` *(Shows the current month's budget details)*
@@ -219,7 +256,7 @@ Sorts your recorded expenses. You can organize them alphabetically by category, 
 **Format:** `sort category` or `sort date` or `sort amount`
 
 **Examples:**
-* `sort category`
+* `sort CATEGORY`
 * `sort date`
 * `sort amount`
 
@@ -236,10 +273,11 @@ Records money you have lent to someone else. These entries are kept in a separat
 ### Recording a repayment: `repay`
 Updates your loan ledger when someone pays you back, marking the debt as settled. The index you provide corresponds to the list of *outstanding* loans.
 
-**Format:** `repay INDEX`
+**Format:** `repay INDEX [AMOUNT]`
 
 **Example:**
-* `repay 1`
+* `repay 1` *(Records a full repayment for the 1st outstanding loan)*
+* `repay 1 5.00` *(Records a partial repayment of $5.00 for the 1st outstanding loan)*
 
 
 ### Viewing all loans: `loans`
@@ -254,7 +292,7 @@ Predicts your end-of-month total spending based on your current daily habits. If
 
 * Calculates your average daily spend (burn rate) for the current month.
 * Projects your total expenses for the final day of the month.
-* Note: This command does not accept any additional trailing text or flags.
+* Note: This command strictly accepts no additional parameters.
 
 
 ### Clearing all expenses: `clear`
@@ -281,6 +319,8 @@ Exits the program and ensures all data is safely saved to your hard drive.
 **A:** Simply install Java 17 on the new computer, download the `SpendSwift.jar` file, and copy your `data/expenses.txt` file into the same folder on the new machine. When you launch SpendSwift, it will automatically load your history!
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Command Summary
 

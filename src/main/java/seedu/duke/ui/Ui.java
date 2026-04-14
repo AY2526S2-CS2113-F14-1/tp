@@ -297,6 +297,24 @@ public class Ui {
     }
 
     /**
+     * Displays an error when the user tries to edit an expense amount to $0.00 or less.
+     */
+    public void showInvalidEditAmountWarning() {
+        System.out.println(LINE);
+        System.out.println("Invalid amount! You cannot edit an expense to be $0.00 or less.");
+        System.out.println(LINE);
+    }
+
+    /**
+     * Displays an error when the user enters a year outside the realistic range.
+     */
+    public void showInvalidYearWarning() {
+        System.out.println(LINE);
+        System.out.println("Invalid date! Please enter a realistic year (between 2000 and 2100).");
+        System.out.println(LINE);
+    }
+
+    /**
      * Displays an error when the index provided is not a valid integer.
      */
     public void showInvalidIndexFormat() {

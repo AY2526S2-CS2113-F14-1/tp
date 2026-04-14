@@ -1,12 +1,42 @@
 # Developer Guide
 
+## Table of Contents
+* [Acknowledgements](#acknowledgements)
+* [Design & Implementation](#design--implementation)
+   * [Ui Component](#ui-component)
+   * [Add Feature](#add-feature)
+   * [Delete Feature](#delete-feature)
+   * [List Feature](#list-feature)
+   * [Edit Expense Feature](#edit-expense-feature)
+   * [Category and Date Parsing](#category-and-date-parsing)
+   * [Loan Tracking System](#loan-tracking-system)
+   * [Interactive Category Selection](#interactive-category-selection)
+   * [Predictive Spending Forecast](#predictive-spending-forecast)
+   * [Find / Filter Feature](#find--filter-feature)
+   * [Help Feature](#help-feature)
+   * [Storage & Persistence](#storage--persistence)
+   * [Input Validation (Strict Commands)](#input-validation-strict-commands)
+   * [Budget Feature](#budget-feature)
+   * [Sort Feature](#sort-feature)
+   * [Statistics Feature](#statistics-feature)
+   * [Clear Feature](#clear-feature)
+* [Product Scope](#product-scope)
+   * [Target user profile](#target-user-profile)
+   * [Value proposition](#value-proposition)
+* [User Stories](#user-stories)
+* [Non-Functional Requirements](#non-functional-requirements)
+* [Glossary](#glossary)
+* [Instructions for Manual Testing](#instructions-for-manual-testing)
+
+<div style="page-break-after: always;"></div>
+
 ## Acknowledgements
 
 * This project is heavily based on the [Duke project template](https://se-education.org/duke/) created by the [SE-EDU initiative](https://se-education.org).
 * Testing is supported by the [JUnit 5](https://junit.org/junit5/) framework.
 * Project structure and documentation draw inspiration from the SE-EDU guidelines.
 
-## Design & implementation
+## Design & Implementation
 
 This section describes the internal design of SpendSwift and explains how the main components and selected features are implemented.
 
@@ -158,28 +188,22 @@ Below is the sequence of interactions when the user enters a valid command such 
 The edit feature allows users to modify one or more fields of an existing expense using the `edit` command.
 
 **How it works:**
-The user provides a 1-based index followed by one or more optional flags:
-- `/a` to update the monetary value
-- `/de` to update the description
-- `/c` to update the category
-- `/da` to update the date (must follow `YYYY-MM-DD` format)
-
-At least one flag must be supplied; omitted fields retain their existing values.
+The user provides a 1-based index followed by one or more optional flags (`/a` for amount, `/de` for description, `/c` for category, `/da` for date). At least one flag must be supplied, and the flags can appear in any order.
 
 **Implementation:**
-`Parser.parseEditCommand()` extracts the index and each flag from the input string sequentially. Each flag is located by its keyword using `indexOf()`, its value is extracted up to the next `/` or the end of the input, and then it is stripped from the working string before the next flag is processed. This substring manipulation algorithm allows flags to appear in any order without ambiguity.
-
-Once all fields are parsed, an `EditCommand` is constructed with nullable fields for each of the four attributes.
+`Parser.parseEditCommand()` extracts the index and each flag sequentially. It strips the identified flag and its corresponding value from the working string, allowing the parser to handle the flags completely agnostic of their input order.
 
 Below is the sequence of interactions when the user enters a valid command like `edit 1 /a 15.0`:
 
 *Figure 5: Sequence Diagram detailing the Edit feature execution.*
-![Sequence Diagram for Edit Command](images/edit-logic-diagram.png)
+![Sequence Diagram for Edit Command](images/edit-command-sequence-diagram.png)
 
-In `EditCommand.execute()`, the existing `Expense` at the given index is retrieved, each non-null field replaces the corresponding existing value, and a new `Expense` object is created and written back via `ExpenseList.setExpense()`.
-
-**Design considerations:**
-`Expense` objects are immutable (all fields are `final`), so editing produces a new `Expense` rather than mutating the existing one. An alternative considered was making `Expense` mutable with setter methods, but immutability was preferred to avoid unintended side effects across the codebase.
+In `EditCommand.execute()`:
+1. The existing `Expense` at the given 0-based index is retrieved.
+2. Because `Expense` objects are immutable, a **new** `Expense` object is created using the updated fields (or the existing fields if a specific flag was not provided).
+3. The new object overwrites the old one via `ExpenseList.setExpense()`.
+4. If the date was modified, the list is automatically re-sorted chronologically.
+5. `ExpenseList.isOverBudget()` is called to warn the user if this edit pushes them over their monthly limit.
 
 ### Category and Date Parsing
 
@@ -189,29 +213,32 @@ Commands like `add` and `edit` support optional flags such as `/c` for category 
 
 ### Loan Tracking System
 
-The Loan Tracking System allows users to manage debts separately from their primary expenses.
+The Loan Tracking System allows users to manage debts (money lent to others) completely separately from their primary expenses.
+
+**Design Consideration:**
+We chose to keep loans in a separate ledger (`ArrayList<Loan>`) rather than mixing them into the main `ExpenseList`. Treating a loan as a standard expense would artificially inflate the user's spending totals and trigger false "Budget Exceeded" warnings for money that was not actually consumed, ruining the integrity of the `stats` and `forecast` features.
 
 **Implementation:**
-The system is centered around the `Loan` class, which extends the `Expense` class to reuse validation logic but introduces a `borrowerName` and an `isRepaid` boolean flag.
+The system is centered around the `Loan` class, which extends the `Expense` class to reuse basic validation logic but introduces a `borrowerName`, an `isRepaid` flag, and an `amountRepaid` tracker.
 
 The ledger is managed by three specific commands:
 
-1. **LendCommand**: Instantiates a `Loan` object and adds it to the internal `ArrayList<Loan>` managed by `ExpenseList`.
+1. **LendCommand**: Instantiates a `Loan` object and adds it to the internal loan list.
 
-Below is the sequence of interactions when the user enters a valid command like `lend 20 Alice`:
+*Figure 6a: Sequence Diagram detailing the Lend feature execution.*
+![Sequence Diagram for Lend Command](images/lend-command-sequence-diagram.png)
 
-*Figure 6: Sequence Diagram detailing the Lend feature execution.*
-![Sequence Diagram for Lend Command](images/loan-logic-diagram.png)
+2. **LoansCommand**: Queries the `ExpenseList` to display the current loans. By default, it fetches only outstanding loans via `ExpenseList.getOutstandingLoans()`. If the user supplies the `/all` flag, it bypasses this filter to show both outstanding and historically settled debts.
 
-2. **LoansCommand**: Queries the `Ui` to display the current outstanding balance. It handles the `/all` flag to show both outstanding and settled debts.
-3. **RepayCommand**: Rather than using an absolute index of the entire loan array, `RepayCommand` fetches a filtered list via `ExpenseList.getOutstandingLoans()`. The user's 1-based index is mapped to this dynamic list, and the selected loan is marked as repaid.
+3. **RepayCommand**: Rather than using an absolute index of the entire loan array, `RepayCommand` maps the user's 1-based index directly to the *filtered* list of outstanding loans. This significantly improves the UX, as users do not have to manually count past settled debts to find the correct index.
+
+*Figure 6b: Sequence Diagram detailing the Repay feature execution.*
+![Sequence Diagram for Repay Command](images/repay-command-sequence-diagram.png)
+
+When executed, `RepayCommand` fetches the target `Loan`. If an amount is provided, it calls `loan.repay(amount)` to record a partial payment. If the repayment meets or exceeds the outstanding balance, or if no amount is provided, it calls `loan.markRepaid()` to permanently settle the debt.
 
 **Storage Integration:**
 To persist this parallel data structure, the `Storage` class was modified to support multiple data types in a single file. Loan entries are prefixed with the `LOAN |` marker (e.g., `LOAN | 20.0 | 2026-04-01 | Alice | false`). During `load()`, the `Storage` class identifies this prefix, parses the loan using `parseLoanLine()`, and routes it to `ExpenseList.addLoan()` rather than the standard expense list.
-
-**Design Consideration:**
-- **Separate Ledgers**: We chose to keep loans in a separate list rather than the main `ExpenseList` to prevent temporary debt from skewing the "Statistics" and "Budget" features, which are intended strictly for personal spending analysis.
-- **Dynamic Repayment Indexing**: By mapping the `repay INDEX` to the *outstanding* loans list rather than the full historical list, we vastly improved the UX, preventing the user from having to manually count past, settled debts.
 
 ### Interactive Category Selection
 
@@ -388,7 +415,7 @@ During `save()`, the `Storage` class:
 
 ### Input Validation (Strict Commands)
 
-The `help` and `total` commands do not accept any arguments.
+The `help`, `total`, and `forecast` commands do not accept any arguments.
 If trailing text is detected after these keywords, the parser shows an unknown command message and returns `null`.
 
 The `exit` command also does not accept any arguments.
@@ -396,6 +423,27 @@ If trailing text is detected, the parser shows a strict-usage warning and return
 
 The `list` command accepts either no arguments or a single `YYYY-MM` argument.
 Any other argument format is rejected.
+
+### Total Feature
+
+The total feature allows users to quickly view the absolute sum of all their recorded expenses using the `total` command.
+
+**How it works:**
+The user types `total` with no additional arguments. If any trailing text is provided, the parser rejects it to strictly enforce the command format.
+
+**Implementation:**
+When `Parser.parse()` receives the `total` command, it constructs a `TotalCommand`. Because this is a read-only operation, `TotalCommand.shouldPersist()` returns `false`, ensuring no file writes are triggered.
+
+Below is the sequence of interactions when the user enters `total`:
+
+*Figure: Sequence Diagram detailing the Total feature execution.*
+![Sequence Diagram for Total Command](images/total-command-sequence-diagram.png)
+
+`TotalCommand.execute()` operates by:
+1. Fetching the total number of expenses via `ExpenseList.getSize()`.
+2. Iterating through the list to retrieve each `Expense` and accumulating their values using `getAmount()`.
+3. Logging the calculation process internally using Java's `Logger` (set to `Level.FINE` so it remains invisible to the user but helpful for debugging).
+4. Passing the final calculated sum and the expense count to `Ui.showTotal()` for display.
 
 ### Budget Feature
 
@@ -551,16 +599,17 @@ Below is the sequence of interactions when the user enters `clear`:
 
 ---
 
+<div style="page-break-after: always;"></div>
 
-## Product scope
+## Product Scope
 
-### Target user profile
+### Target User Profile
 
 * **Demographic:** University students (like those at NUS) and young professionals.
 * **Habits:** Spends a lot of time on their computer/terminal, prefers typing over mouse interactions, and wants a fast, no-nonsense way to log daily expenses (like meals and transport).
 * **Needs:** Needs a way to enforce a strict budget, categorize spending, and maintain data locally without relying on cloud services or slow mobile apps.
 
-### Value proposition
+### Value Proposition
 
 SpendSwift solves the problem of friction in financial tracking. Most budgeting apps require navigating multiple menus and screens just to log a $5 coffee. SpendSwift allows power users to log, edit, and review their finances instantly using simple Command Line Interface (CLI) commands, keeping their hands on the keyboard and their focus unbroken.
 
@@ -596,10 +645,12 @@ SpendSwift solves the problem of friction in financial tracking. Most budgeting 
 |v2.0|user|clear all expenses|start fresh with a clean expense list|
 |v2.0|user|list expenses for a specific month|review my spending for a particular time period|
 
+<div style="page-break-after: always;"></div>
+
 ## Non-Functional Requirements
 
 1. **Performance:** The system should respond to any user command within 2 seconds.
-2. **Portability:** The application must work seamlessly across Windows, macOS, and Linux environments, provided Java 17 or higher is installed.
+2. **Portability:** The application must work seamlessly across Windows, macOS, and Linux environments, provided Java 17 is installed.
 3. **Data Integrity:** The application must safely persist data to a local text file (`data/expenses.txt`) and be able to recover or skip corrupted lines without crashing.
 4. **Usability:** A user with average typing speed should be able to log a new expense faster than using a GUI-based mobile application.
 
@@ -609,7 +660,7 @@ SpendSwift solves the problem of friction in financial tracking. Most budgeting 
 * **Architecture** - The overall structural design of the software, determining how different components (like Parser, Storage, and Commands) interact.
 * **Persisted Data** - Information that is saved to the user's hard drive (in `expenses.txt`) so it is not lost when the application closes.
 
-## Instructions for manual testing
+## Instructions For Manual Testing
 
 Given below are instructions to test the app manually.
 
@@ -722,11 +773,3 @@ Given below are instructions to test the app manually.
 2. **Cancel clear:**
    * Run: `clear`, then type `no` at the prompt.
    * *Expected:* Expenses remain unchanged.
-
-### Automated Test Coverage
-
-The project uses JUnit 5 for automated testing. Test suites exist for every command class, the `Parser`, `Storage`, `ExpenseList`, `Expense`, `Loan`, and `Ui`. Integration tests in `SpendSwiftTest` verify end-to-end workflows including persistence across restarts.
-
-As of the latest build, the project achieves **97% line coverage** and **84% branch coverage** across all classes. The remaining uncovered branches are primarily:
-- **Assertion branches**: Java `assert` statements are counted as branches by JaCoCo. Since assertions verify invariants that are always true in correct code, these branches are intentionally never taken during normal execution.
-- **IOException catch blocks**: Error paths in `Storage` that fire only on filesystem failures (disk full, permission denied). These are platform-dependent and not practical to trigger in portable JUnit tests.
