@@ -52,6 +52,8 @@ Whether you are a university student tracking daily meals or managing a strict b
 
 ---
 
+<div style="page-break-after: always;"></div>
+
 ## Notes about the Command Format
 
 Before diving into the features, here are the strict rules regarding how SpendSwift interprets your commands. **Please keep these in mind to ensure smooth operation:**
@@ -69,6 +71,8 @@ Before diving into the features, here are the strict rules regarding how SpendSw
 * **Strict Commands:** Commands that do not require parameters (like `total`, `forecast`, `clear`, and `exit`) are strictly validated. Adding any extra text or characters after these keywords will cause the command to be rejected.
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Notes on User Interaction
 
@@ -315,6 +319,8 @@ Exits the program and ensures all data is safely saved to your hard drive.
 **A:** Simply install Java 17 on the new computer, download the `SpendSwift.jar` file, and copy your `data/expenses.txt` file into the same folder on the new machine. When you launch SpendSwift, it will automatically load your history!
 
 ---
+
+<div style="page-break-after: always;"></div>
 
 ## Command Summary
 

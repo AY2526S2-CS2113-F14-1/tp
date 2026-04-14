@@ -196,7 +196,7 @@ The user provides a 1-based index followed by one or more optional flags (`/a` f
 Below is the sequence of interactions when the user enters a valid command like `edit 1 /a 15.0`:
 
 *Figure 5: Sequence Diagram detailing the Edit feature execution.*
-![Sequence Diagram for Edit Command](images/edit-command-diagram.png)
+![Sequence Diagram for Edit Command](images/edit-command-sequence-diagram.png)
 
 In `EditCommand.execute()`:
 1. The existing `Expense` at the given 0-based index is retrieved.
@@ -226,14 +226,14 @@ The ledger is managed by three specific commands:
 1. **LendCommand**: Instantiates a `Loan` object and adds it to the internal loan list.
 
 *Figure 6a: Sequence Diagram detailing the Lend feature execution.*
-![Sequence Diagram for Lend Command](images/lend-command-diagram.png)
+![Sequence Diagram for Lend Command](images/lend-command-sequence-diagram.png)
 
 2. **LoansCommand**: Queries the `ExpenseList` to display the current loans. By default, it fetches only outstanding loans via `ExpenseList.getOutstandingLoans()`. If the user supplies the `/all` flag, it bypasses this filter to show both outstanding and historically settled debts.
 
 3. **RepayCommand**: Rather than using an absolute index of the entire loan array, `RepayCommand` maps the user's 1-based index directly to the *filtered* list of outstanding loans. This significantly improves the UX, as users do not have to manually count past settled debts to find the correct index.
 
 *Figure 6b: Sequence Diagram detailing the Repay feature execution.*
-![Sequence Diagram for Repay Command](images/repay-command-diagram.png)
+![Sequence Diagram for Repay Command](images/repay-command-sequence-diagram.png)
 
 When executed, `RepayCommand` fetches the target `Loan`. If an amount is provided, it calls `loan.repay(amount)` to record a partial payment. If the repayment meets or exceeds the outstanding balance, or if no amount is provided, it calls `loan.markRepaid()` to permanently settle the debt.
 
@@ -437,7 +437,7 @@ When `Parser.parse()` receives the `total` command, it constructs a `TotalComman
 Below is the sequence of interactions when the user enters `total`:
 
 *Figure: Sequence Diagram detailing the Total feature execution.*
-![Sequence Diagram for Total Command](images/total-command-diagram.png)
+![Sequence Diagram for Total Command](images/total-command-sequence-diagram.png)
 
 `TotalCommand.execute()` operates by:
 1. Fetching the total number of expenses via `ExpenseList.getSize()`.
@@ -599,6 +599,7 @@ Below is the sequence of interactions when the user enters `clear`:
 
 ---
 
+<div style="page-break-after: always;"></div>
 
 ## Product scope
 
@@ -643,6 +644,8 @@ SpendSwift solves the problem of friction in financial tracking. Most budgeting 
 |v2.0|user|delete expenses by date|quickly remove all items from a specific day at once|
 |v2.0|user|clear all expenses|start fresh with a clean expense list|
 |v2.0|user|list expenses for a specific month|review my spending for a particular time period|
+
+<div style="page-break-after: always;"></div>
 
 ## Non-Functional Requirements
 
