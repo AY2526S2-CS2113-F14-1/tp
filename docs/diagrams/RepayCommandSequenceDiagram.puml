@@ -1,0 +1,51 @@
+@startuml RepayCommandSequenceDiagram
+hide footbox
+skinparam defaultFontName Arial
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #555555
+skinparam sequenceParticipantBackgroundColor #FEFEFE
+skinparam sequenceLifeLineBorderColor #777777
+skinparam shadowing false
+
+participant ":SpendSwift" as main #LightCyan
+participant "<<class>>\nParser" as parser #D5E8D4
+participant ":ExpenseList" as el #DAE8FC
+participant "loan:Loan" as loan #FCE5CD
+participant ":Ui" as ui #FFF9C4
+
+User -> main : "repay 1"
+activate main
+
+main -> parser : parse("repay 1", ui)
+activate parser
+
+create participant "r:RepayCommand" as cmd #D5E8D4
+parser -> cmd : new RepayCommand(ui, 1, null)
+activate cmd
+cmd --> parser
+deactivate cmd
+
+parser --> main : r
+deactivate parser
+
+main -> cmd : execute(expenseList)
+activate cmd
+
+cmd -> el : getOutstandingLoans()
+activate el
+el --> cmd : outstandingList
+deactivate el
+
+cmd -> loan : markRepaid()
+activate loan
+loan --> cmd
+deactivate loan
+
+cmd -> ui : showRepaid(loan)
+activate ui
+ui --> cmd
+deactivate ui
+
+cmd --> main
+deactivate cmd
+@enduml
