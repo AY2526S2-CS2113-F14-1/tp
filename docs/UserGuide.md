@@ -207,16 +207,17 @@ Sets, updates, or views a monthly spending budget.
 
 
 ### Finding and filtering expenses: `find`
-Searches your expense list using a keyword and/or filters. All filters are optional and can be combined freely.
+Searches your expense list using a keyword and/or filters. At least one keyword or filter must be provided.
 
-**Format:** `find [KEYWORD] [/c CATEGORY] [/dmin DATE] [/dmax DATE] [/amin AMOUNT] [/amax AMOUNT] [/sort asc|desc]`
+**Format:** `find KEYWORD [/c CATEGORY] [/dmin DATE] [/dmax DATE] [/amin AMOUNT] [/amax AMOUNT] [/sort asc|desc]`
 
-* `KEYWORD` searches across both description and category (case-insensitive).
+* `KEYWORD` searches across both description and category (case-insensitive). It can be omitted if at least one filter flag is provided.
 * `/c CATEGORY` filters by exact category match.
 * `/dmin` and `/dmax` filter by date range (inclusive, YYYY-MM-DD format).
-* `/amin` and `/amax` filter by amount range (inclusive). Minimum must not exceed maximum.
+* `/amin` and `/amax` filter by amount range (inclusive). Values must be non-negative. Minimum must not exceed maximum.
 * `/dmin` must not be after `/dmax`. Reversed ranges are rejected with an error message.
 * `/sort asc` or `/sort desc` sorts results by amount.
+* Each filter flag can only be used once per command.
 
 **Examples:**
 * `find coffee` *(All expenses containing "coffee")*

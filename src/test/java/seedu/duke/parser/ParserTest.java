@@ -619,4 +619,34 @@ public class ParserTest {
     public void parse_helpNoArgs_returnsHelpCommand() {
         assertTrue(Parser.parse("help", ui) instanceof HelpCommand);
     }
+
+    @Test
+    public void parse_editWithPipeChar_returnsNull() {
+        assertNull(Parser.parse("edit 1 /de Coffee | Latte", ui));
+    }
+
+    @Test
+    public void parse_findNegativeAmin_returnsNull() {
+        assertNull(Parser.parse("find /amin -5", ui));
+    }
+
+    @Test
+    public void parse_findNegativeAmax_returnsNull() {
+        assertNull(Parser.parse("find /amax -1", ui));
+    }
+
+    @Test
+    public void parse_findDuplicateSort_returnsNull() {
+        assertNull(Parser.parse("find /sort asc /sort desc", ui));
+    }
+
+    @Test
+    public void parse_findDuplicateAmin_returnsNull() {
+        assertNull(Parser.parse("find /amin 5 /amin 10", ui));
+    }
+
+    @Test
+    public void parse_findDuplicateDmin_returnsNull() {
+        assertNull(Parser.parse("find /dmin 2026-01-01 /dmin 2026-02-01", ui));
+    }
 }
