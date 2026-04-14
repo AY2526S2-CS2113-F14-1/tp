@@ -1,4 +1,4 @@
-# SpendSwift - User Guide
+# User Guide
 
 ## Table of Contents
 * [Introduction](#introduction)

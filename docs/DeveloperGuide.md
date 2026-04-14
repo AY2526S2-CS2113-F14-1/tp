@@ -1,4 +1,4 @@
-# SpendSwift - Developer Guide
+# Developer Guide
 
 ## Table of Contents
 * [Acknowledgements](#acknowledgements)
