@@ -649,4 +649,9 @@ public class ParserTest {
     public void parse_findDuplicateDmin_returnsNull() {
         assertNull(Parser.parse("find /dmin 2026-01-01 /dmin 2026-02-01", ui));
     }
+
+    @Test
+    public void parse_lendWithPipeChar_returnsNull() {
+        assertNull(Parser.parse("lend 50 Alice | Bob", ui));
+    }
 }

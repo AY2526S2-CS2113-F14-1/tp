@@ -418,7 +418,7 @@ During `save()`, the `Storage` class:
 
 ### Input Validation (Strict Commands)
 
-The `total` and `forecast` commands do not accept any arguments.
+The `total`, `forecast`, and `clear` commands do not accept any arguments.
 If trailing text is detected after these keywords, the parser shows an unknown command message and returns `null`.
 
 The `help` command accepts either no arguments or a single command name.

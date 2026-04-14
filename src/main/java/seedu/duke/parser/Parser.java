@@ -480,6 +480,10 @@ public class Parser {
             ui.showLendUsage();
             return null;
         }
+        if (arguments.contains("|")) {
+            ui.showInvalidCharacterWarning();
+            return null;
+        }
 
         String[] inputParts = arguments.split("\\s+", 2);
         if (inputParts.length < 2) {

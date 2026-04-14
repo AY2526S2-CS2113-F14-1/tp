@@ -127,14 +127,13 @@ public class Ui {
         System.out.println("  total                                     - Show total amount spent");
         System.out.println("  budget [AMOUNT]                           - View/set current month's budget");
         System.out.println("  budget [YYYY-MM] [AMOUNT]                 - View/set a specific month's budget");
-        System.out.println("  delete INDEX                              - Delete an expense by index");
+        System.out.println("  delete INDEX|/c CAT|/da DATE              - Delete expense(s)");
         System.out.println("  edit INDEX [/a AMOUNT] [/de DESC]         - Edit an existing expense");
         System.out.println("             [/c CATEGORY] [/da DATE]");
         System.out.println("  find [KEYWORD] [/c CAT] [/dmin DATE]      - Find/filter expenses");
         System.out.println("       [/dmax DATE] [/amin AMT] [/amax AMT] [/sort asc|desc]");
         System.out.println("  sort category|date|amount                 - Sort expenses");
-        System.out.println("  stats                                     - Show spending statistics and graph " +
-                "by category");
+        System.out.println("  stats [YYYY]                              - Show yearly budget dashboard");
         System.out.println("  lend AMOUNT BORROWER [/da DATE]           - Record money lent to someone");
         System.out.println("  loans                                     - Show outstanding loans");
         System.out.println("  loans /all                                - Show all loans (incl. repaid)");

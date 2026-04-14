@@ -30,6 +30,8 @@ This section summarizes my specific contributions to the project. My primary foc
     * Added pipe character validation to edit command to prevent save file corruption
     * Added negative amount rejection for find `/amin` and `/amax` filters
     * Added duplicate flag detection for all find filter flags (`/sort`, `/amin`, `/amax`, `/dmin`, `/dmax`)
+    * Added pipe character validation to lend command to prevent borrower name corruption
+    * Fixed help menu: added `clear`, updated `delete` to show batch modes, updated `stats` description
 
 * **Contributions to the UG**:
     * Authored the `find`, `delete`, `budget`, `stats`, and `help` command sections.
