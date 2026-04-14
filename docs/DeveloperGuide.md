@@ -601,7 +601,7 @@ Below is the sequence of interactions when the user enters `clear`:
 
 <div style="page-break-after: always;"></div>
 
-## Product scope
+## Product Scope
 
 ### Target user profile
 
