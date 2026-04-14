@@ -139,9 +139,10 @@ public class Ui {
         System.out.println("  loans                                     - Show outstanding loans");
         System.out.println("  loans /all                                - Show all loans (incl. repaid)");
         System.out.println("  repay INDEX [AMOUNT]                      - Repay a loan (fully or partially)");
+        System.out.println("  clear                                     - Clear all expenses");
+        System.out.println("  forecast                                  - Show end-of-month spending forecast");
         System.out.println("  help [COMMAND]                            - Show help for a command");
         System.out.println("  exit                                      - Exit the application");
-        System.out.println("  forecast                                  - Show end-of-month spending forecast");
         System.out.println("Note: DATE must be in YYYY-MM-DD format (e.g. 2026-03-24).");
         System.out.println("Available categories: Food, Transport, Shopping, Entertainment, Health, Others");
         System.out.println(LINE);
